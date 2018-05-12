@@ -6,24 +6,23 @@ import urllib2
 ###############################   Web Download   #############################################################################################
 get_html = urllib2.urlopen("http://google.de")
 page_source = get_html.read()
-
+from HTMLParser import HTMLParser
 ###############################   Strip Html Tags   ###########################################################################################
-def strip_html_tags(html_and_txt):
-   
-   converted_list = list(html_and_txt)
-   i,j = 0,0
-	
-   while i < len(converted_list):
-      if converted_list[i] == '<':# כשטאג נפתח
-         while converted_list[i] != '>':#מוחק הכל עד שהוא נסגר
-            converted_list.pop(i)
-         converted_list.pop(i)# מוחק גם את סוף הטאג
-      else:
-         i=i+1 # אם לא נפתח טאג ממשיך הלאה
-		
-   spaces='' 
-   return spaces.join(converted_list) # מוסיף רווחים
-print strip_html_tags (page_source)
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset() # cleans the buffer and setting up
+        self.fed = []
+    def handle_data(self, l): # gets word and uppend it to a list
+        self.fed.append(l)
+    def handle_entityref(self, name):
+        self.fed.append('&%s;' % name)#using regex to clean the html out
+    def get_data(self): # getting all to words togheter
+        return ''.join(self.fed)
+
+def html_to_text(html): # building an object and activiting the class
+    s = MLStripper()
+    s.feed(html) # 'feeding' the class each word
+    return s.get_data()
 ###############################    TF - IDF   #################################################################################################
 tokenize = lambda doc: doc.lower().split(" ") # organizing the text
 
