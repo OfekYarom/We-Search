@@ -3,6 +3,63 @@ from __future__ import division
 import string
 import math
 import urllib2
+import Tkinter as tk
+from Tkinter import *
+###############################   UI   #############################################################################################
+
+def raise_frame(frame):
+    frame.tkraise()
+    
+def Search():
+    lambda:raise_frame(f2).pack()
+    #document_0 = txt_get()
+    # what to do when search button clicked
+    
+def review():
+    pass
+    # what to do when review button clicked
+    
+
+root = Tk() # creating tk window
+
+f1 = Frame(root)
+f1.pack()
+f2 = Frame(root)
+x_cordnite = ((root.winfo_screenwidth()/2) - 500)
+y_cordnite = ((root.winfo_screenheight()/2) - 325)
+root.geometry(("%dx%d+%d+%d") %(1000,650,x_cordnite,y_cordnite))
+root.resizable(0, 0)
+root.title("Search Engine") # giving the window a name
+
+#page one
+lbl_0 = Label(f1, text = "Search Engine", font = ("Arial Bold",50))
+lbl_0.grid(column=1, row = 1, sticky=(W, E))
+lbl_1 = Label(f1, text = "Looking for info? Type it here and we will find it for you!", font = ("Arial Bold",28))
+lbl_1.grid(column=1, row = 2, sticky=(W, E))
+txt = Entry(f1, width=70)
+txt.grid(column = 1, row = 3, pady = 40)
+txt.focus()
+btn = Button(f1, text="Search", command=Search)
+btn.grid(column=1, row=4)
+
+#page two
+lbl_2 = Label(f2, text = "Is this was helpful?", font = ("Arial Bold",27))
+lbl_2.grid(column=1, row = 5)
+rad1 = Radiobutton(f2,text='Helpful', value=1)
+rad2 = Radiobutton(f2,text='Not Helpful', value=2)
+rad3 = Radiobutton(f2,text='I Dont Know', value=3)
+rad1.grid(column=1, row=6)
+rad2.grid(column=1, row=7)
+rad3.grid(column=1, row=8)
+
+raise_frame(f1)
+
+
+root.mainloop() # making it to run until closed by user
+
+
+
+
 ###############################   Web Download   #############################################################################################
 get_html = urllib2.urlopen("http://google.de")
 page_source = get_html.read()
