@@ -9,7 +9,9 @@ from Tkinter import *
 
 def raise_frame(frame):
     frame.tkraise()
-    
+def Search():
+    raise_frame(f2)
+    # what to do when Search button clicked    
     
 def Send():
     X = var.get()
@@ -43,13 +45,15 @@ lbl_1.grid(column=1, row = 2, sticky=(W, E))
 txt = Entry(f1, width=70)
 txt.grid(column = 1, row = 3, pady = 40)
 txt.focus()
-btn = Button(f1, text="Search", command=lambda:raise_frame(f2))
+btn = Button(f1, text="Search", command=Search)
 btn.grid(column=1, row=4)
 
 #page two
 var = IntVar()
 lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",50))
 lbl_4.grid(column=1, row = 1, sticky=(W, E))
+lbl_10 = Label(f2, text = "Text", font = ("Arial Bold",50))
+lbl_10.grid(column=1, row = 2, sticky=(W, E))
 lbl_2 = Label(f2, text = "Is this was helpful? do you want something better?", font = ("Arial Bold",31))
 lbl_2.grid(column=1, row = 5, sticky=(W, E))
 rad1 = Radiobutton(f2,text='Helpful',  variable=var, value=1)
