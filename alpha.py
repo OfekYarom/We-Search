@@ -10,26 +10,30 @@ from Tkinter import *
 def raise_frame(frame):
     frame.tkraise()
     
-def Search():
-    lambda:raise_frame(f2).pack()
-    #document_0 = txt_get()
-    # what to do when search button clicked
     
-def review():
-    pass
+def Send():
+    X = var.get()
+    if (X == 1 or X == 3):
+       raise_frame(f3)
+    if (X == 2):
+       raise_frame(f3)
+    if (X == 4):
+       raise_frame(f1)
     # what to do when review button clicked
-    
 
 root = Tk() # creating tk window
 
 f1 = Frame(root)
-f1.pack()
 f2 = Frame(root)
+f3 = Frame(root)
 x_cordnite = ((root.winfo_screenwidth()/2) - 500)
 y_cordnite = ((root.winfo_screenheight()/2) - 325)
 root.geometry(("%dx%d+%d+%d") %(1000,650,x_cordnite,y_cordnite))
 root.resizable(0, 0)
 root.title("Search Engine") # giving the window a name
+
+for frame in (f1, f2, f3):
+    frame.grid(row=0, column=0, sticky='news')
 
 #page one
 lbl_0 = Label(f1, text = "Search Engine", font = ("Arial Bold",50))
@@ -39,18 +43,37 @@ lbl_1.grid(column=1, row = 2, sticky=(W, E))
 txt = Entry(f1, width=70)
 txt.grid(column = 1, row = 3, pady = 40)
 txt.focus()
-btn = Button(f1, text="Search", command=Search)
+btn = Button(f1, text="Search", command=lambda:raise_frame(f2))
 btn.grid(column=1, row=4)
 
 #page two
-lbl_2 = Label(f2, text = "Is this was helpful?", font = ("Arial Bold",27))
-lbl_2.grid(column=1, row = 5)
-rad1 = Radiobutton(f2,text='Helpful', value=1)
-rad2 = Radiobutton(f2,text='Not Helpful', value=2)
-rad3 = Radiobutton(f2,text='I Dont Know', value=3)
+var = IntVar()
+lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",50))
+lbl_4.grid(column=1, row = 1, sticky=(W, E))
+lbl_2 = Label(f2, text = "Is this was helpful? do you want something better?", font = ("Arial Bold",31))
+lbl_2.grid(column=1, row = 5, sticky=(W, E))
+rad1 = Radiobutton(f2,text='Helpful',  variable=var, value=1)
+rad2 = Radiobutton(f2,text='Not Helpful',  variable=var, value=2)
+rad3 = Radiobutton(f2,text='I Dont Know',  variable=var, value=3)
+rad4 = Radiobutton(f2,text='I Want to Search Agin',  variable=var, value=4)
 rad1.grid(column=1, row=6)
 rad2.grid(column=1, row=7)
 rad3.grid(column=1, row=8)
+rad4.grid(column=1, row=9)
+btn = Button(f2, text="Send", command=Send)
+btn.grid(column=1, row=10)
+
+#page three
+lbl_5 = Label(f3, text = "Search Engine", font = ("Arial Bold",50))
+lbl_5.grid(column=1, row = 1, sticky=(W, E))
+lbl_6 = Label(f3, text = "Thank You For Helping Us Improve!", font = ("Arial Bold",44))
+lbl_6.grid(column=1, row = 2, sticky=(W, E))
+lbl_7 = Label(f3, text = "Please Come Back Agin For Better Answer", font = ("Arial Bold",20))
+lbl_7.grid(column=1, row = 3, sticky=(W, E))
+
+
+
+
 
 raise_frame(f1)
 
