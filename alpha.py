@@ -6,11 +6,12 @@ import urllib2
 import Tkinter as tk
 from Tkinter import *
 ###############################   UI   #############################################################################################
-
 def raise_frame(frame):
     frame.tkraise()
 def Search():
+    seacrhing_word = txt.get()
     raise_frame(f2)
+    lbl_10.config(text=last_result)
     # what to do when Search button clicked    
     
 def Send():
@@ -74,6 +75,11 @@ lbl_6 = Label(f3, text = "Thank You For Helping Us Improve!", font = ("Arial Bol
 lbl_6.grid(column=1, row = 2, sticky=(W, E))
 lbl_7 = Label(f3, text = "Please Come Back Agin For Better Answer", font = ("Arial Bold",20))
 lbl_7.grid(column=1, row = 3, sticky=(W, E))
+lbl_8 = Label(f3, text = "Want To Try Agin?", font = ("Arial Bold",20))
+lbl_8.grid(column=1, row = 4, sticky=(W, E))
+btn = Button(f3, text="Try Agin", command=lambda:raise_frame(f1))
+btn.grid(column=1, row=10)
+
 
 
 
@@ -110,8 +116,9 @@ def html_to_text(html): # building an object and activiting the class
 ###############################    TF - IDF   #################################################################################################
 tokenize = lambda doc: doc.lower().split(" ") # organizing the text
 
-document_0 = "the create pillow."
-document_1 = "the the the."
+
+document_0 = seacrhing_word
+document_1 = "the the"
 document_2 = "the pillow."
 document_3 = "create pillow."
 document_4 = "the create"
@@ -195,7 +202,9 @@ def orgnize_info():
                final_match =  all_documents[one_result[2]]
    return final_match
    
-print orgnize_info()
+last_result = orgnize_info()
+print last_result
+
 
 
 
