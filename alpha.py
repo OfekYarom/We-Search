@@ -5,6 +5,7 @@ import math
 import urllib2
 import Tkinter as tk
 from Tkinter import *
+import wikipedia
 ###############################    TF - IDF   #################################################################################################[
 global all_documents
 global tokenize
@@ -13,14 +14,23 @@ def documents (doc_0):
     global all_documents
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
     document_0 = doc_0
-    document_1 = "the the the."
-    document_2 = "the pillow."
-    document_3 = "create pillow."
-    document_4 = "the create"
-    document_5 = "soft pillow."
-    document_6 = "the create"
+    document_1 = (wikipedia.summary(("%s") % (doc_0)))
+    document_2 = (wikipedia.page(("%s") % (doc_0)))
+    document_2 = document_2.content
+    all_documents = [document_0, document_1, document_2]
+    splited = doc_0.split()
+    if ((len(splited))>1):
+        count = 1
+        while ((len(splited)>= count)):
+            all_documents.append ((count*2+1))
+            all_documents.append ((count*2+2))
+            word = splited[count-1]
+            Page = (wikipedia.page(("%s") % (word)))
+            all_documents[count*2+1] = Page.content
+            all_documents[count*2+2] = (wikipedia.summary(("%s") % (word)))
+            count = count + 1
 
-    all_documents = [document_0, document_1, document_2, document_3, document_4, document_5, document_6]
+    
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
    count = tokenized_document.count(term) # counting how many times the term is shown in the doucement
@@ -149,7 +159,7 @@ btn.grid(column=1, row=4)
 var = IntVar()
 lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",50))
 lbl_4.grid(column=1, row = 1, sticky=(W, E))
-lbl_10 = Label(f2, text = "txt", font = ("Arial Bold",10))
+lbl_10 = Label(f2, text = "txt", font = ("Arial Bold",1))
 lbl_10.grid(column=1, row = 2, sticky=(W, E))
 lbl_2 = Label(f2, text = "Is this was helpful? do you want something better?", font = ("Arial Bold",31))
 lbl_2.grid(column=1, row = 5, sticky=(W, E))
@@ -207,6 +217,3 @@ def html_to_text(html): # building an object and activiting the class
     s = MLStripper()
     s.feed(html) # 'feeding' the class each word
     return s.get_data()
-
-
-
