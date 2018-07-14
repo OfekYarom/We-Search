@@ -21,16 +21,23 @@ def documents (doc_0):
     splited = doc_0.split()
     if ((len(splited))>1):
         count = 1
-        while ((len(splited)>= count)):
-            all_documents.append ((count*2+1))
-            all_documents.append ((count*2+2))
+        while (((len(splited))>= count)):
             word = splited[count-1]
-            Page = (wikipedia.page(("%s") % (word)))
-            all_documents[count*2+1] = Page.content
-            all_documents[count*2+2] = (wikipedia.summary(("%s") % (word)))
+            try:
+                urllib2.urlopen(('https://en.wikipedia.org/wiki/%s') %(word))
+            except urllib2.HTTPError, e:
+                pass
+            except urllib2.URLError, e:
+                pass
+            else:
+                if ((urllib2.urlopen(('https://en.wikipedia.org/wiki/%s') %(word)))  )
+                Page = (wikipedia.page(("%s") % (word)))
+                doc_one = Page.content
+                doc_two = (wikipedia.summary(("%s") % (word)))
+                all_documents.append (doc_one)
+                all_documents.append (doc_two)
             count = count + 1
 
-    
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
    count = tokenized_document.count(term) # counting how many times the term is shown in the doucement
