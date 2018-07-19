@@ -56,7 +56,7 @@ def sublinear_term_frequency(term, tokenized_document): # getting the term and t
 def inverse_document_frequencies(tokenized_documents): # getting a document
     idf_values = {}
     all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creatung a set of all the terms in all the documents
-    for tkn in all_tokens_set: # for each input
+    for tkn in all_tokens_set: # לכל מונח ברשימה
         contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  moving the terms into a map
         idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token))) # puts in dictionary the value of each word by dividing the number of times the word appears by the total words
     return idf_values
@@ -120,6 +120,19 @@ def algo (all_documents):# combining all the functions to get the formula and th
            our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
    return orgnize_info(our_tfidf_comparisons)
 # doing this process for each doc
+###############################   Nurmlzition for text   #############################################################################################
+def text_normal(the_out):
+    i = 0
+    full =[]
+    for word in (the_out.split()):
+        full.append(word)
+        i+= 1
+        if i == 10:
+            i = 0
+            full.append ("\n")
+    complite = (' '.join(full))
+    return complite
+
 ###############################   UI   #############################################################################################
 global textInput
 def raise_frame(frame): # function for raising pages
@@ -129,6 +142,7 @@ def Search(): # set up and start the procses of the TF IDF
     textInput=txt.get() # get the word from the user
     documents(textInput)# get it inside the tfidf
     textOutPut= algo(all_documents) # starts the tf idf
+    textOutPut = text_normal (textOutPut)
     lbl_10["text"] = textOutPut # bring the output to the user
     raise_frame(f2)# opens the next page to show the output
     # what to do when Search button clicked    
@@ -199,6 +213,14 @@ btn_11 = Button(f3, text="Try Agin", command=(lambda:raise_frame(f1)))
 btn_11.grid(column=1, row=10)
 
 
+
+
+
+
+
+
+root.mainloop() # making it to run until closed by user
+
 ###############################   Strip Html Tags   ###########################################################################################
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -216,5 +238,4 @@ def html_to_text(html): # building an object and activiting the class
     s.feed(html) # 'feeding' the class each word
     return s.get_data()
 
-root.mainloop() # making it to run until closed by user
 raise_frame(f1)# opening the first page - starts UI
