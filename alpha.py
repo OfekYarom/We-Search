@@ -199,14 +199,6 @@ btn_11 = Button(f3, text="Try Agin", command=(lambda:raise_frame(f1)))
 btn_11.grid(column=1, row=10)
 
 
-
-
-
-
-
-
-root.mainloop() # making it to run until closed by user
-
 ###############################   Strip Html Tags   ###########################################################################################
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -225,3 +217,4 @@ def html_to_text(html): # building an object and activiting the class
     return s.get_data()
 
 raise_frame(f1)# opening the first page - starts UI
+root.mainloop() # making it to run until closed by user
