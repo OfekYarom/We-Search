@@ -216,5 +216,5 @@ def html_to_text(html): # building an object and activiting the class
     s.feed(html) # 'feeding' the class each word
     return s.get_data()
 
-raise_frame(f1)# opening the first page - starts UI
 root.mainloop() # making it to run until closed by user
+raise_frame(f1)# opening the first page - starts UI
