@@ -3,14 +3,18 @@ import urllib
 from __future__ import division
 import string
 import math
+import urllib
 import urllib2
 import Tkinter as tk
 from Tkinter import *
 import wikipedia
-###############################    TF - IDF   #################################################################################################[
+from HTMLParser import HTMLParser
+###############################    TF - IDF   #################################################################################################
 global all_documents
 global tokenize
 def documents (doc_0):
+    # get the text from wikipedia according to the user input
+    # the function is getting the text for each word and for the all input
     global tokenize
     global all_documents
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
@@ -20,7 +24,7 @@ def documents (doc_0):
     document_2 = document_2.content
     all_documents = [document_0, document_1, document_2]
     splited = doc_0.split()
-    if ((len(splited))>1):
+    if ((len(splited))>1): # checks if the web pages exists
         count = 1
         while (((len(splited))>= count)):
             word = splited[count-1]
@@ -108,7 +112,7 @@ def orgnize_info(our_tfidf_comparisons):
                
                final_match =  all_documents[one_result[2]]
    return final_match
-def algo (all_documents):
+def algo (all_documents):# combining all the functions to get the formula and the result
    tfidf_representation = tfidf(all_documents)
    our_tfidf_comparisons = []
    for count_0, doc_0 in enumerate(tfidf_representation):
@@ -118,18 +122,18 @@ def algo (all_documents):
 # doing this process for each doc
 ###############################   UI   #############################################################################################
 global textInput
-def raise_frame(frame):
+def raise_frame(frame): # function for raising pages
     frame.tkraise()
-def Search():
+def Search(): # set up and start the procses of the TF IDF
     global textInput
-    textInput=txt.get()
-    documents(textInput)
-    textOutPut= algo(all_documents)
-    lbl_10["text"] = textOutPut
-    raise_frame(f2)
+    textInput=txt.get() # get the word from the user
+    documents(textInput)# get it inside the tfidf
+    textOutPut= algo(all_documents) # starts the tf idf
+    lbl_10["text"] = textOutPut # bring the output to the user
+    raise_frame(f2)# opens the next page to show the output
     # what to do when Search button clicked    
     
-def Send():
+def Send(): # the algorithem for the radio buttons
     X = var.get()
     if (X == 1 or X == 3):
        raise_frame(f3)
@@ -140,10 +144,11 @@ def Send():
     # what to do when review button clicked
 
 root = Tk() # creating tk window
-
+#creats the components of the pages & the pages
 f1 = Frame(root)
 f2 = Frame(root)
 f3 = Frame(root)
+# setting the pages size acording to the screen size
 x_cordnite = ((root.winfo_screenwidth()/2) - 500)
 y_cordnite = ((root.winfo_screenheight()/2) - 325)
 root.geometry(("%dx%d+%d+%d") %(1000,650,x_cordnite,y_cordnite))
@@ -153,7 +158,7 @@ root.title("Search Engine") # giving the window a name
 for frame in (f1, f2, f3):
     frame.grid(row=0, column=0, sticky='news')
 
-#page one
+#page one - get Search Word
 lbl_0 = Label(f1, text = "Search Engine", font = ("Arial Bold",50))
 lbl_0.grid(column=1, row = 1, sticky=(W, E))
 lbl_1 = Label(f1, text = "Looking for info? Type it here and we will find it for you!", font = ("Arial Bold",28))
@@ -164,7 +169,7 @@ txt.focus()
 btn = Button(f1, text="Search", command=Search)
 btn.grid(column=1, row=4)
 
-#page two
+#page two - get Feedback
 var = IntVar()
 lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",50))
 lbl_4.grid(column=1, row = 1, sticky=(W, E))
@@ -183,7 +188,7 @@ rad4.grid(column=1, row=9)
 btn = Button(f2, text="Send", command=Send)
 btn.grid(column=1, row=10)
 
-#page three
+#page three - L
 lbl_5 = Label(f3, text = "Search Engine", font = ("Arial Bold",50))
 lbl_5.grid(column=1, row = 1, sticky=(W, E))
 lbl_6 = Label(f3, text = "Thank You For Helping Us Improve!", font = ("Arial Bold",44))
@@ -198,18 +203,10 @@ btn_11.grid(column=1, row=10)
 
 
 
-raise_frame(f1)
 
 
 root.mainloop() # making it to run until closed by user
 
-
-
-
-###############################   Web Download   #############################################################################################
-get_html = urllib2.urlopen("http://google.de")
-page_source = get_html.read()
-from HTMLParser import HTMLParser
 ###############################   Strip Html Tags   ###########################################################################################
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -226,3 +223,5 @@ def html_to_text(html): # building an object and activiting the class
     s = MLStripper()
     s.feed(html) # 'feeding' the class each word
     return s.get_data()
+
+raise_frame(f1)# opening the first page - starts UI
