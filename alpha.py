@@ -1,4 +1,5 @@
 ###############################   Import   ##################################################################################################
+import urllib
 from __future__ import division
 import string
 import math
@@ -24,18 +25,19 @@ def documents (doc_0):
         while (((len(splited))>= count)):
             word = splited[count-1]
             try:
-                urllib2.urlopen(('https://en.wikipedia.org/wiki/%s') %(word))
+                urllib2.urlopen
             except urllib2.HTTPError, e:
                 pass
             except urllib2.URLError, e:
                 pass
             else:
-                if ((urllib2.urlopen(('https://en.wikipedia.org/wiki/%s') %(word)))  )
-                Page = (wikipedia.page(("%s") % (word)))
-                doc_one = Page.content
-                doc_two = (wikipedia.summary(("%s") % (word)))
-                all_documents.append (doc_one)
-                all_documents.append (doc_two)
+                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)).getcode()))
+                if stat == 200:
+                    Page = (wikipedia.page(("%s") % (word)))
+                    doc_one = Page.content
+                    doc_two = (wikipedia.summary(("%s") % (word)))
+                    all_documents.append (doc_one)
+                    all_documents.append (doc_two)
             count = count + 1
 
 
