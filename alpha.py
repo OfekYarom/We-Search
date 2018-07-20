@@ -28,14 +28,15 @@ def documents (doc_0):
         count = 1
         while (((len(splited))>= count)):
             word = splited[count-1]
-            try:
+            try:# checks if web page is working without shouting down
                 urllib2.urlopen
             except urllib2.HTTPError, e:
                 pass
             except urllib2.URLError, e:
                 pass
-            else:
-                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)).getcode()))
+            else: # if no eror acourding its keep runing the web page
+                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)).getcode())) 
+                # if the web page contian info its keep runing.
                 if stat == 200:
                     Page = (wikipedia.page(("%s") % (word)))
                     doc_one = Page.content
@@ -122,6 +123,7 @@ def algo (all_documents):# combining all the functions to get the formula and th
 # doing this process for each doc
 ###############################   Nurmlzition for text   #############################################################################################
 def text_normal(the_out):
+    # orgnaizing the text for containing no more than 10 words in a line
     i = 0
     full =[]
     for word in (the_out.split()):
