@@ -57,7 +57,7 @@ def sublinear_term_frequency(term, tokenized_document): # getting the term and t
 def inverse_document_frequencies(tokenized_documents): # getting a document
     idf_values = {}
     all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creatung a set of all the terms in all the documents
-    for tkn in all_tokens_set: # לכל מונח ברשימה
+    for tkn in all_tokens_set: # for every word
         contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  moving the terms into a map
         idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token))) # puts in dictionary the value of each word by dividing the number of times the word appears by the total words
     return idf_values
