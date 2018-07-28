@@ -1,6 +1,6 @@
 ###############################   Import   ##################################################################################################
-import urllib
 from __future__ import division
+import urllib
 import string
 import math
 import urllib
@@ -17,32 +17,72 @@ def documents (doc_0):
     # the function is getting the text for each word and for the all input
     global tokenize
     global all_documents
+    global error
+    error = 0
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
     document_0 = doc_0
-    document_1 = (wikipedia.summary(("%s") % (doc_0)))
-    document_2 = (wikipedia.page(("%s") % (doc_0)))
-    document_2 = document_2.content
-    all_documents = [document_0, document_1, document_2]
+    all_documents = [document_0]
+    check_url = ((('https://en.wikipedia.org/wiki/%s') %(doc_0)))
+    check_url = check_url.replace(" ", "_")
+    try:# checks if web page is working without shouting down
+        (urllib.urlopen(check_url))
+    except urllib2.HTTPError, e:
+        pass
+    except urllib2.URLError, e:
+        pass
+    else: # if no eror acourding its keep runing the web page
+        stat1 = (urllib.urlopen(check_url)).getcode()
+        # if the web page contian info its keep runing.
+        if stat1 == 200:
+                response = (urllib2.urlopen(check_url))
+                page_source = response.read()
+                if "usually refers to:" not in page_source: 
+                    Page = (wikipedia.page(("%s") % (doc_0)))
+                    doc_one = Page.content
+                    doc_two = (Page.summary)
+                    all_documents.append (doc_one)
+                    all_documents.append (doc_two)
+                    error = error + 1
     splited = doc_0.split()
     if ((len(splited))>1): # checks if the web pages exists
         count = 1
         while (((len(splited))>= count)):
             word = splited[count-1]
             try:# checks if web page is working without shouting down
-                urllib2.urlopen
+                (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word))))
             except urllib2.HTTPError, e:
                 pass
             except urllib2.URLError, e:
                 pass
             else: # if no eror acourding its keep runing the web page
-                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)).getcode())) 
+                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)))).getcode()
                 # if the web page contian info its keep runing.
                 if stat == 200:
-                    Page = (wikipedia.page(("%s") % (word)))
-                    doc_one = Page.content
-                    doc_two = (wikipedia.summary(("%s") % (word)))
-                    all_documents.append (doc_one)
-                    all_documents.append (doc_two)
+                    amount_results = (wikipedia.search(("%s") % (word)))
+                    last = 0
+                    for i in amount_results:
+                        if last == 0:
+                            try:# checks if web page is working without shouting down
+                                (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
+                            except urllib2.HTTPError, e:
+                                pass
+                            except urllib2.URLError, e:
+                                pass
+                            else: # if no eror acourding its keep runing the web page
+                                stat1 = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(i)))).getcode()
+                                # if the web page contian info its keep runing.
+                                if stat1 == 200:
+                                    response = (urllib2.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
+                                    page_source = response.read()
+                                    if "usually refers to:" not in page_source: 
+                                        Page = (wikipedia.page(("%s") % (i)))
+                                        doc_one = Page.content
+                                        doc_two = (Page.summary)
+                                        all_documents.append (doc_one)
+                                        all_documents.append (doc_two)
+                                        error = error + 1
+                                        last = last + 1
+                                
             count = count + 1
 
 
@@ -129,7 +169,7 @@ def text_normal(the_out):
     for word in (the_out.split()):
         full.append(word)
         i+= 1
-        if i == 10:
+        if i == 15:
             i = 0
             full.append ("\n")
     complite = (' '.join(full))
@@ -141,12 +181,16 @@ def raise_frame(frame): # function for raising pages
     frame.tkraise()
 def Search(): # set up and start the procses of the TF IDF
     global textInput
+    global error
     textInput=txt.get() # get the word from the user
     documents(textInput)# get it inside the tfidf
     textOutPut= algo(all_documents) # starts the tf idf
     textOutPut = text_normal (textOutPut)
     lbl_10["text"] = textOutPut # bring the output to the user
-    raise_frame(f2)# opens the next page to show the output
+    if error > 0:
+        raise_frame(f2)# opens the next page to show the output
+    else:
+        raise_frame(f4)
     # what to do when Search button clicked    
     
 def Send(): # the algorithem for the radio buttons
@@ -164,6 +208,7 @@ root = Tk() # creating tk window
 f1 = Frame(root)
 f2 = Frame(root)
 f3 = Frame(root)
+f4 = Frame(root)
 # setting the pages size acording to the screen size
 x_cordnite = ((root.winfo_screenwidth()/2) - 500)
 y_cordnite = ((root.winfo_screenheight()/2) - 325)
@@ -171,7 +216,7 @@ root.geometry(("%dx%d+%d+%d") %(1000,650,x_cordnite,y_cordnite))
 root.resizable(0, 0)
 root.title("Search Engine") # giving the window a name
 
-for frame in (f1, f2, f3):
+for frame in (f1, f2, f3, f4):
     frame.grid(row=0, column=0, sticky='news')
 
 #page one - get Search Word
@@ -189,7 +234,7 @@ btn.grid(column=1, row=4)
 var = IntVar()
 lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",50))
 lbl_4.grid(column=1, row = 1, sticky=(W, E))
-lbl_10 = Label(f2, text = "txt", font = ("Arial Bold",1))
+lbl_10 = Label(f2, text = "txt", font = ("Arial Bold",10))
 lbl_10.grid(column=1, row = 2, sticky=(W, E))
 lbl_2 = Label(f2, text = "Is this was helpful? do you want something better?", font = ("Arial Bold",31))
 lbl_2.grid(column=1, row = 5, sticky=(W, E))
@@ -204,7 +249,7 @@ rad4.grid(column=1, row=9)
 btn = Button(f2, text="Send", command=Send)
 btn.grid(column=1, row=10)
 
-#page three - L
+#page three - Last Messege
 lbl_5 = Label(f3, text = "Search Engine", font = ("Arial Bold",50))
 lbl_5.grid(column=1, row = 1, sticky=(W, E))
 lbl_6 = Label(f3, text = "Thank You For Helping Us Improve!", font = ("Arial Bold",44))
@@ -214,6 +259,15 @@ lbl_7.grid(column=1, row = 3, sticky=(W, E))
 btn_11 = Button(f3, text="Try Agin", command=(lambda:raise_frame(f1)))
 btn_11.grid(column=1, row=10)
 
+#page Four - Last Messege
+lbl_12 = Label(f4, text = "Search Engine", font = ("Arial Bold",50))
+lbl_12.grid(column=1, row = 1, sticky=(W, E))
+lbl_13 = Label(f4, text = "Error Occurred", font = ("Arial Bold",44))
+lbl_13.grid(column=1, row = 2, sticky=(W, E))
+lbl_14 = Label(f4, text = "Please Check Your Spelling And Try Agin", font = ("Arial Bold",20))
+lbl_14.grid(column=1, row = 3, sticky=(W, E))
+btn_15 = Button(f4, text="Try Agin", command=(lambda:raise_frame(f1)))
+btn_15.grid(column=1, row=10)
 
 
 
@@ -221,7 +275,7 @@ btn_11.grid(column=1, row=10)
 
 
 
-root.mainloop() # making it to run until closed by user
+
 
 ###############################   Strip Html Tags   ###########################################################################################
 class MLStripper(HTMLParser):
@@ -240,4 +294,7 @@ def html_to_text(html): # building an object and activiting the class
     s.feed(html) # 'feeding' the class each word
     return s.get_data()
 
+
 raise_frame(f1)# opening the first page - starts UI
+
+root.mainloop() # making it to run until closed by user
