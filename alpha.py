@@ -19,31 +19,34 @@ def documents (doc_0):
     all_documents = [document_0]
     check_url = ((('https://en.wikipedia.org/wiki/%s') %(doc_0)))
     check_url = check_url.replace(" ", "_")
-    try:# checks if web page is working without shouting down
-        (urllib.urlopen(check_url))
+    try:# checks if web page is working without getting errors
+        urllib.urlopen(check_url)
     except urllib2.HTTPError, e:
         pass
     except urllib2.URLError, e:
         pass
-    else: # if no eror acourding its keep runing the web page
+    else: # if no eror acourded the program keep runing the web page
         stat1 = (urllib.urlopen(check_url)).getcode()
-        # if the web page contian info its keep runing.
         if stat1 == 200:
-                response = (urllib2.urlopen(check_url))
-                page_source = response.read()
-                if "usually refers to:" not in page_source: 
-                    Page = (wikipedia.page(("%s") % (doc_0)))
-                    doc_one = Page.content
-                    doc_two = (Page.summary)
-                    all_documents.append (doc_one)
-                    all_documents.append (doc_two)
-                    error = error + 1
+            # if the web page contians info its keep runing.
+            response = (urllib2.urlopen(check_url))
+            page_source = response.read()
+            if "usually refers to:" not in page_source:
+                #gets the info from the web page
+                Page = (wikipedia.page(("%s") % (doc_0)))
+                doc_one = Page.content
+                doc_two = (Page.summary)
+                all_documents.append (doc_one)
+                all_documents.append (doc_two)
+                error = error + 1
     splited = doc_0.split()
-    if ((len(splited))>1): # checks if the web pages exists
+    if ((len(splited))>1):
+        #if the input is built from more than one word
+        # the program gets the info for each word separately
         count = 1
         while (((len(splited))>= count)):
             word = splited[count-1]
-            try:# checks if web page is working without shouting down
+            try:# checks if web page is working without getting errors
                 (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word))))
             except urllib2.HTTPError, e:
                 pass
@@ -51,13 +54,13 @@ def documents (doc_0):
                 pass
             else: # if no eror acourding its keep runing the web page
                 stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)))).getcode()
-                # if the web page contian info its keep runing.
+                # if the web page contians info its keep runing.
                 if stat == 200:
                     amount_results = (wikipedia.search(("%s") % (word)))
                     last = 0
                     for i in amount_results:
                         if last == 0:
-                            try:# checks if web page is working without shouting down
+                            try:# checks if web page is working without getting errors
                                 (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
                             except urllib2.HTTPError, e:
                                 pass
@@ -69,7 +72,8 @@ def documents (doc_0):
                                 if stat1 == 200:
                                     response = (urllib2.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
                                     page_source = response.read()
-                                    if "usually refers to:" not in page_source: 
+                                    if "usually refers to:" not in page_source:
+                                        #gets the info from the web page
                                         Page = (wikipedia.page(("%s") % (i)))
                                         doc_one = Page.content
                                         doc_two = (Page.summary)
@@ -157,14 +161,15 @@ def algo (all_documents):# combining all the functions to get the formula and th
    return orgnize_info(our_tfidf_comparisons)
 # doing this process for each doc
 ###############################   Nurmlzition for text   #############################################################################################
-def text_normal(the_out):
-    # orgnaizing the text for containing no more than 10 words in a line
+def text_normal(the_out, the_size):
+    # orgnaizing the text for containing not too much words a line
+    # depends on the amount of text is changing the length of a line and the size of the text.
     i = 0
     full =[]
     for word in (the_out.split()):
         full.append(word)
         i+= 1
-        if i == 15:
+        if i == int(the_size):
             i = 0
             full.append ("\n")
     complite = (' '.join(full))
@@ -179,10 +184,20 @@ def Search(): # set up and start the procses of the TF IDF
     textInput=txt.get() # get the word from the user
     documents(textInput)# get it inside the tfidf
     textOutPut= algo(all_documents) # starts the tf idf
-    textOutPut = text_normal (textOutPut)
+    if (len(textOutPut.split())) < 330:
+        i=0
+        textOutPut = text_normal (textOutPut, 15)
+    else:
+        i=1
+        textOutPut = text_normal (textOutPut, 43)
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
-        raise_frame(f2)# opens the next page to show the output
+        if i==0:
+            raise_frame(f2)# opens the next page to show the output
+        else:
+            raise_frame(f2)# opens the next page to show the output
+            lbl_10.config(font=("Arial Bold", alot_of_txt))
+            # depends on the amount of text is changing the length of a line and the size of the text.
     else:
         raise_frame(f4)# if no output have found
     # what to do when Search button clicked
