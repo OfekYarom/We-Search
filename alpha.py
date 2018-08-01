@@ -8,11 +8,9 @@ from Tkinter import *
 import wikipedia
 ###############################    TF - IDF   #################################################################################################
 def documents (doc_0):
+    
     # get the text from wikipedia according to the user input
     # the function is getting the text for each word and for the all input
-    global tokenize
-    global all_documents
-    global error
     error = 0
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
     document_0 = doc_0
@@ -81,9 +79,13 @@ def documents (doc_0):
                                         all_documents.append (doc_two)
                                         error = error + 1
                                         last = last + 1
-                                
             count = count + 1
-
+            if (((len(splited)) < count)):
+                out_put_fun =[all_documents, error, tokenize]
+                return out_put_fun
+    else:
+        out_put_fun =[all_documents, error, tokenize]
+        return out_put_fun
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
    count = tokenized_document.count(term) # counting how many times the term is shown in the doucement
@@ -103,7 +105,7 @@ def inverse_document_frequencies(tokenized_documents): # getting a document
 
 # returning this value
 
-def tfidf(documents):
+def tfidf(documents, tokenize):
     tokenized_documents = [tokenize(d) for d in documents]# converting the documents to a different format
     idf = inverse_document_frequencies(tokenized_documents) #putting the value of each word in a varbile by idf
     tfidf_documents = []
@@ -127,7 +129,7 @@ def cosine_similarity(vector1, vector2):
     return dot_product/magnitude
 #normalization
 
-def orgnize_info(our_tfidf_comparisons):
+def orgnize_info(our_tfidf_comparisons, all_documents):
    final_match = " "
    best_match = 0
    second_match = 0
@@ -152,13 +154,13 @@ def orgnize_info(our_tfidf_comparisons):
                
                final_match =  all_documents[one_result[2]]
    return final_match
-def algo (all_documents):# combining all the functions to get the formula and the result
-   tfidf_representation = tfidf(all_documents)
+def algo (all_documents,tokenize):# combining all the functions to get the formula and the result
+   tfidf_representation = tfidf(all_documents, tokenize)
    our_tfidf_comparisons = []
    for count_0, doc_0 in enumerate(tfidf_representation):
        for count_1, doc_1 in enumerate(tfidf_representation):
            our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
-   return orgnize_info(our_tfidf_comparisons)
+   return orgnize_info(our_tfidf_comparisons, all_documents)
 # doing this process for each doc
 ###############################   Nurmlzition for text   #############################################################################################
 def text_normal(the_out, the_size):
@@ -179,11 +181,12 @@ def text_normal(the_out, the_size):
 def raise_frame(frame): # function for raising pages
     frame.tkraise()
 def Search(): # set up and start the procses of the TF IDF
-    global textInput
-    global error
     textInput=txt.get() # get the word from the user
-    documents(textInput)# get it inside the tfidf
-    textOutPut= algo(all_documents) # starts the tf idf
+    in_put_fun = documents(textInput)# get it inside the tfidf
+    all_documents = in_put_fun[0]
+    error = in_put_fun[1]
+    tokenize = in_put_fun[2]
+    textOutPut= algo(all_documents, tokenize) # starts the tf idf
     if (len(textOutPut.split())) < 330:
         i=0
         textOutPut = text_normal (textOutPut, 15)
