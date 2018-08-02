@@ -202,17 +202,19 @@ def Search(): # set up and start the procses of the TF IDF
             lbl_10.config(font=("Arial Bold", alot_of_txt))
             # depends on the amount of text is changing the length of a line and the size of the text.
     else:
+        txt.delete(0, 'end')
         raise_frame(f4)# if no output have found
     # what to do when Search button clicked
     
 def Send(): # the algorithem for the radio buttons
     X = var.get()
     if (X == 1 or X == 3):
-       raise_frame(f3)
+        raise_frame(f3)
     if (X == 2):
-       raise_frame(f3)
+        raise_frame(f3)
     if (X == 4):
-       raise_frame(f1)
+        txt.delete(0, 'end')
+        raise_frame(f1)
     # what to do when review button clicked
 
 root = Tk() # creating tk window
