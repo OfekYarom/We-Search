@@ -9,13 +9,9 @@ def Search(): # set up and start the procses of the TF IDF
     api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.1/%s' % (textInput)
     response = requests.get(api_url)
     textOutPut= response.text
-    error = textOutPutClient [-2]
-    i = textOutPutClient [-5]
-    OLDLIST = list(textOutPutClient)  # convert to list
-    del(OLDLIST[0])
-    del(OLDLIST[1])
-    del(OLDLIST[-1])
-    textOutPut = textOutPutClient
+    error = textOutPut [-2]
+    i = textOutPut [-5]
+    textOutPut = textOutPut# i need to fix the format
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
         if i==0:
