@@ -1,4 +1,3 @@
-import json
 import requests
 import Tkinter as tk
 from Tkinter import *
@@ -10,9 +9,13 @@ def Search(): # set up and start the procses of the TF IDF
     api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.1/%s' % (textInput)
     response = requests.get(api_url)
     textOutPut= response.text
-    textOutPut = textOutPutClient [0]
-    error = textOutPutClient [1]
-    i = textOutPutClient [2]
+    error = textOutPutClient [-2]
+    i = textOutPutClient [-5]
+    OLDLIST = list(textOutPutClient)  # convert to list
+    del(OLDLIST[0])
+    del(OLDLIST[1])
+    del(OLDLIST[-1])
+    textOutPut = textOutPutClient
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
         if i==0:
