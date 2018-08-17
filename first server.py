@@ -174,6 +174,8 @@ def index(KEYWORD):
     error = in_put_fun[1]
     tokenize = in_put_fun[2]
     textOutPut= algo(all_documents, tokenize) # starts the tf idf
+    textOutPut = textOutPut.replace("\n", "")
+    textOutPut = textOutPut.replace("\'", "")
     if (len(textOutPut.split())) < 330:
         i=0
     else:
