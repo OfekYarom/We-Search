@@ -32,8 +32,6 @@ def Search(): # set up and start the procses of the TF IDF
         the_size = 15
     else:
         the_size = 43
-    
-    print textOutPut
     textOutPut = text_normal (textOutPut,the_size)
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
