@@ -1,7 +1,22 @@
 import requests
 import Tkinter as tk
 from Tkinter import *
+###############################   Nurmlzition for text   #############################################################################################
+def text_normal(the_out, the_size):
+    # orgnaizing the text for containing not too much words a line
+    # depends on the amount of text is changing the length of a line and the size of the text.
+    i = 0
+    full =[]
+    for word in (the_out.split()):
+        full.append(word)
+        i+= 1
+        if i == int(the_size):
+            i = 0
+            full.append ("\n")
+    complite = (' '.join(full))
+    return complite
 ###############################   UI   #############################################################################################
+
 def raise_frame(frame): # function for raising pages
     frame.tkraise()
 def Search(): # set up and start the procses of the TF IDF
@@ -13,8 +28,13 @@ def Search(): # set up and start the procses of the TF IDF
     i = int(textOutPut [-5])
     textOutPut = textOutPut[:-8]
     textOutPut = textOutPut[3:]
-    textOutPut = textOutPut# i need to fix the format
+    if i == 0:
+        the_size = 15
+    else:
+        the_size = 43
+    
     print textOutPut
+    textOutPut = text_normal (textOutPut,the_size)
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
         if i==0:
