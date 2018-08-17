@@ -1,7 +1,5 @@
 ###############################   Import   ##################################################################################################
-
 from flask import Flask
-import json
 import string
 import math
 import urllib
@@ -163,20 +161,7 @@ def algo (all_documents,tokenize):# combining all the functions to get the formu
            our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
    return orgnize_info(our_tfidf_comparisons, all_documents)
 # doing this process for each doc
-###############################   Nurmlzition for text   #############################################################################################
-def text_normal(the_out, the_size):
-    # orgnaizing the text for containing not too much words a line
-    # depends on the amount of text is changing the length of a line and the size of the text.
-    i = 0
-    full =[]
-    for word in (the_out.split()):
-        full.append(word)
-        i+= 1
-        if i == int(the_size):
-            i = 0
-            full.append ("\n")
-    complite = (' '.join(full))
-    return complite
+
 ###############################   FLASK   #############################################################################################
 
 app = Flask(__name__)
@@ -191,10 +176,8 @@ def index(KEYWORD):
     textOutPut= algo(all_documents, tokenize) # starts the tf idf
     if (len(textOutPut.split())) < 330:
         i=0
-        textOutPut = text_normal (textOutPut, 15)
     else:
         i=1
-        textOutPut = text_normal (textOutPut, 43)
     out_put_client = [textOutPut, i, error]
     return "%s" %(out_put_client)
 
