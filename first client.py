@@ -9,9 +9,12 @@ def Search(): # set up and start the procses of the TF IDF
     api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.1/%s' % (textInput)
     response = requests.get(api_url)
     textOutPut= response.text
-    error = textOutPut [-2]
-    i = textOutPut [-5]
+    error = int(textOutPut [-2])
+    i = int(textOutPut [-5])
+    textOutPut = textOutPut[:-8]
+    textOutPut = textOutPut[3:]
     textOutPut = textOutPut# i need to fix the format
+    print textOutPut
     lbl_10["text"] = textOutPut # bring the output to the user
     if error > 0:
         if i==0:
