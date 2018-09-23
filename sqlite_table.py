@@ -11,7 +11,7 @@ def print_method():
 
 def Create_table():
     c.execute('''CREATE TABLE searchr
-             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT)''')
+             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
 
 def update_score(grade, name, which_one):
     cell = select(name)
@@ -19,8 +19,12 @@ def update_score(grade, name, which_one):
         score = cell[1]
         number = cell[2]
     else:
-        score = cell[4]
-        number = cell[5]
+        if which_one == 2:
+            score = cell[4]
+            number = cell[5]
+        else:
+            score = cell[7]
+            number = cell[8]
     final_grade = (score*number + grade)/(number+1)
     c.execute('''UPDATE searchr SET score%s=%s WHERE name="%s"''' % (which_one,final_grade, name))
     
@@ -33,9 +37,9 @@ def select(pull):#select data from DB and orgnizing the data
             list_of_info.append(j)
     return list_of_info
 
-def add_info (name, score2, number2, page2):
+def add_info (name, score2, number2, page2, which):
     try:# checks if the name exists
-        c.execute('''UPDATE searchr SET score2=%s, number2=%s, page2="%s" WHERE name="%s"''' % (score2, number2, page2, name))
+        c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s" WHERE name="%s"''' % (which, score2, which, number2, which, page2, name))
         conn.commit()
     except Exception:
         pass
