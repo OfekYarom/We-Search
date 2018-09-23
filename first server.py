@@ -5,7 +5,100 @@ import math
 import urllib
 import urllib2
 import wikipedia
+import sqlite3
 ###############################    TF - IDF   #################################################################################################
+conn = sqlite3.connect(':memory:')
+c = conn.cursor()
+
+def print_method():
+    for i in c:
+        print "\n"
+        for j in i:
+            print j
+
+def Create_table():
+    c.execute('''CREATE TABLE searchr
+             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
+
+def update_score(grade, name, which_one):
+    cell = select(name)
+    if which_one == 1:#check which of the pages to update         
+        score = cell[1]
+        number = cell[2]
+    else:
+        if which_one == 2:
+            score = cell[4]
+            number = cell[5]
+        else:
+            score = cell[7]
+            number = cell[8]
+    final_grade = (score*number + grade)/(number+1)
+    c.execute('''UPDATE searchr SET score%s=%s WHERE name="%s"''' % (which_one,final_grade, name))
+    
+    
+def select(pull):#select data from DB and orgnizing the data
+    info = (conn.execute(('SELECT * FROM searchr WHERE name = "%s"') % (pull)))
+    list_of_info =[]
+    for i in info:# getting the info incoded from the temple
+        for j in i: # decoding the info
+            list_of_info.append(j)
+    return list_of_info
+
+def add_info (name, score2, number2, page2, which):
+    try:# checks if the name exists
+        c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s" WHERE name="%s"''' % (which, score2, which, number2, which, page2, name))
+        conn.commit()
+    except Exception:
+        pass
+     
+def create_name1(name, score1, number1, page1):
+    try:# checks if the name exists
+        c.execute('''INSERT INTO searchr (name, score1, number1, page1) VALUES (?, ?, ?, ?)''',(name, score1, number1, page1))
+        conn.commit()
+    except Exception:
+        pass
+
+def create_name2(name, score1, number1, page1, score2, number2, page2):
+    try:# checks if the name exists
+        c.execute('''INSERT INTO searchr (name, score1, number1, page1, score2, number2, page2) VALUES (?, ?, ?, ?, ?, ?, ?)''',(name, score1, number1, page1, score2, number2, page2))
+        conn.commit()
+    except Exception:
+        pass
+def choose (name):
+    try:
+        info  = select(name)
+        page1 = info[1]*info[2]
+        if info[6] != None:
+            page2= info[4]*info[5]
+            if info[8] != None:
+                page3= info[7]*info[8]
+                if page1>page2:
+                    if page1>page3:
+                        PAGE= info[3]
+                    else:
+                        PAGE= info[9]
+                else:
+                    if page2>page3:
+                        PAGE= info[6]
+                    else:
+                        PAGE= info[9]
+            else:
+                if page1>page2:
+                    PAGE= info[3]
+                else:
+                    PAGE= info[6]
+        else:     
+            if ((info[1]) > 0.5):
+                PAGE= info[3]
+            else:
+                PAGE= "RE"
+        return PAGE
+                
+    except Exception:
+        PAGE = "EROR"
+        return PAGE
+    
+            
 def documents (doc_0):
     
     # get the text from wikipedia according to the user input
@@ -169,19 +262,39 @@ app = Flask(__name__)
 @app.route('/SearchEngine/api/v1.1/<string:KEYWORD>', methods=['GET'])
 def index(KEYWORD):
     textInput=KEYWORD # get the word from the user
-    in_put_fun = documents(textInput)# get it inside the tfidf
-    all_documents = in_put_fun[0]
-    error = in_put_fun[1]
-    tokenize = in_put_fun[2]
-    textOutPut= algo(all_documents, tokenize) # starts the tf idf
-    textOutPut = textOutPut.replace("\n", "")
-    textOutPut = textOutPut.replace("\'", "")
-    if (len(textOutPut.split())) < 330:
-        i=0
+    PAGE = choose(textInput)
+    if PAGE == "EROR":
+        in_put_fun = documents(textInput)# get it inside the tfidf
+        all_documents = in_put_fun[0]
+        error = in_put_fun[1]
+        tokenize = in_put_fun[2]
+        textOutPut= algo(all_documents, tokenize) # starts the tf idf
+        textOutPut = textOutPut.replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
+        if (len(textOutPut.split())) < 330:
+            i=0
+        else:
+            i=1
+        out_put_client = [textOutPut, i, error]
+        return "%s" %(out_put_client)
+    if PAGE == "RE":
+        in_put_fun = documents(textInput)# get it inside the tfidf
+        all_documents = in_put_fun[0]
+        error = in_put_fun[1]
+        tokenize = in_put_fun[2]
+        textOutPut= algo(all_documents, tokenize) # starts the tf idf
+        textOutPut = textOutPut.replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
+        if (len(textOutPut.split())) < 330:
+            i=0
+        else:
+            i=1
+        out_put_client = [textOutPut, i, error]
+        
     else:
-        i=1
-    out_put_client = [textOutPut, i, error]
-    return "%s" %(out_put_client)
+        pass
+        
+        
 
 if __name__ == '__main__':
     app.run(debug=True)
