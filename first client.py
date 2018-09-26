@@ -20,13 +20,17 @@ def text_normal(the_out, the_size):
 def raise_frame(frame): # function for raising pages
     frame.tkraise()
 def Search(): # set up and start the procses of the TF IDF
+    global textInput
+    global which
     textInput=txt.get()
     api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.1/%s' % (textInput)
     response = requests.get(api_url)
     textOutPut= response.text
+    print textOutPut
     error = int(textOutPut [-2])
     i = int(textOutPut [-5])
-    textOutPut = textOutPut[:-8]
+    which = int(textOutPut [-8])
+    textOutPut = textOutPut[:-11]
     textOutPut = textOutPut[3:]
     if i == 0:
         the_size = 15
@@ -48,9 +52,15 @@ def Search(): # set up and start the procses of the TF IDF
     
 def Send(): # the algorithem for the radio buttons
     X = var.get()
-    if (X == 1 or X == 3):
+    if (X == 1):
         raise_frame(f3)
+        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"1",which)
+        response = requests.get(feedback_url)
     if (X == 2):
+        raise_frame(f3)
+        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"0",which)
+        response = requests.get(feedback_url)
+    if (X == 3):
         raise_frame(f3)
     if (X == 4):
         txt.delete(0, 'end')
