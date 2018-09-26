@@ -261,6 +261,7 @@ app = Flask(__name__)
 @app.route('/SearchEngine/api/v1.1/<string:KEYWORD>', methods=['GET'])
 def index(KEYWORD):
     textInput=KEYWORD # get the word from the user
+    print textInput
     PAGE = choose(textInput)
     if PAGE == "EROR":
         in_put_fun = documents(textInput,0)# get it inside the tfidf
