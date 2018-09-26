@@ -277,7 +277,7 @@ def index(KEYWORD):
         else:
             i=1
         create_name1(textInput, textOut, 1, title)
-        out_put_client = [textOutPut, i, error]
+        out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
         in_put_fun = documents(textInput,1)# get it inside the tfidf
@@ -294,7 +294,7 @@ def index(KEYWORD):
         else:
             i=1
         add_info (textInput, textOut, 1, title, 2)
-        out_put_client = [textOutPut, i, error]
+        out_put_client = [textOutPut, 2, i, error]
     else:
         list_of_info = select(textInput)
         list_of_info = list_of_info[3]
@@ -306,8 +306,12 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        out_put_client = [textOutPut, i, error]
+        out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
+@app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
+def feedback(THEWORD, THESCORE, WHICH):
+    update_score(THESCORE, THEWORD, WHICH)
+    
 
         
         
