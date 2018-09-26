@@ -7,7 +7,7 @@ import urllib2
 import wikipedia
 import sqlite3
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect(':memory:')
+conn = sqlite3.connect('example.db')
 c = conn.cursor()
 
 def print_method():
@@ -16,9 +16,6 @@ def print_method():
         for j in i:
             print j
 
-def Create_table():
-    c.execute('''CREATE TABLE searchr
-             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
 
 def update_score(grade, name, which_one):
     cell = select(name)
@@ -46,8 +43,10 @@ def select(pull):#select data from DB and orgnizing the data
 
 def add_info (name, score2, number2, page2, which):
     try:# checks if the name exists
-        c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s" WHERE name="%s"''' % (which, score2, which, number2, which, page2, name))
-        conn.commit()
+        info  = select(name)
+        if info[3] != page2:
+            c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s" WHERE name="%s"''' % (which, score2, which, number2, which, page2, name))
+            conn.commit()
     except Exception:
         pass
      
@@ -58,12 +57,6 @@ def create_name1(name, score1, number1, page1):
     except Exception:
         pass
 
-def create_name2(name, score1, number1, page1, score2, number2, page2):
-    try:# checks if the name exists
-        c.execute('''INSERT INTO searchr (name, score1, number1, page1, score2, number2, page2) VALUES (?, ?, ?, ?, ?, ?, ?)''',(name, score1, number1, page1, score2, number2, page2))
-        conn.commit()
-    except Exception:
-        pass
 def choose (name):
     try:
         info  = select(name)
@@ -99,7 +92,7 @@ def choose (name):
         return PAGE
     
             
-def documents (doc_0):
+def documents (doc_0, chance):
     
     # get the text from wikipedia according to the user input
     # the function is getting the text for each word and for the all input
@@ -147,6 +140,8 @@ def documents (doc_0):
                 # if the web page contians info its keep runing.
                 if stat == 200:
                     amount_results = (wikipedia.search(("%s") % (word)))
+                    if chance == 1:
+                        amount_results = amount_results[2:]
                     last = 0
                     for i in amount_results:
                         if last == 0:
@@ -165,6 +160,7 @@ def documents (doc_0):
                                     if "usually refers to:" not in page_source:
                                         #gets the info from the web page
                                         Page = (wikipedia.page(("%s") % (i)))
+                                        title = Page.title
                                         doc_one = Page.content
                                         doc_two = (Page.summary)
                                         all_documents.append (doc_one)
@@ -173,7 +169,7 @@ def documents (doc_0):
                                         last = last + 1
             count = count + 1
             if (((len(splited)) < count)):
-                out_put_fun =[all_documents, error, tokenize]
+                out_put_fun =[all_documents, error, tokenize, title]
                 return out_put_fun
     else:
         out_put_fun =[all_documents, error, tokenize]
@@ -222,30 +218,33 @@ def cosine_similarity(vector1, vector2):
 #normalization
 
 def orgnize_info(our_tfidf_comparisons, all_documents):
-   final_match = " "
-   best_match = 0
-   second_match = 0
-   for z in zip(sorted(our_tfidf_comparisons, reverse = True)):
+    final_match = " "
+    best_match = 0
+    second_match = 0
+    for z in zip(sorted(our_tfidf_comparisons, reverse = True)):
+        
       
-      for one_result in z: #Receives the value of each adjustment and the relevant documents for the adjustment
+        for one_result in z: #Receives the value of each adjustment and the relevant documents for the adjustment
          
-         if one_result [2] == 0 or one_result[1] == 0: # Filters the irrelevant documents
+            if one_result [2] == 0 or one_result[1] == 0: # Filters the irrelevant documents
             
-            for solo in one_result: # Receives all entries in a single configuration
+                for solo in one_result: # Receives all entries in a single configuration
                
-               if (solo < 0.999999 and solo != 0): # Filtering everything that is not the matching value
+                    if (solo < 0.999999 and solo != 0): # Filtering everything that is not the matching value
                   
-                  if solo > best_match: # Checks what is the best match and stores it
-                     best_match = solo
-         if best_match == one_result [0]: #Checking which document that is not zero The match is relevant and stores the result
+                        if solo > best_match: # Checks what is the best match and stores it
+                            best_match = solo
+            if best_match == one_result [0]: #Checking which document that is not zero The match is relevant and stores the result
             
-            if one_result[1] != 0:
+                if one_result[1] != 0:
                
-               final_match = all_documents[one_result[1]]
-            if one_result[2] != 0:
+                    final_match = all_documents[one_result[1]]
+                if one_result[2] != 0:
                
-               final_match =  all_documents[one_result[2]]
-   return final_match
+                    final_match =  all_documents[one_result[2]]
+    final = [final_match, best_match]
+    return final
+
 def algo (all_documents,tokenize):# combining all the functions to get the formula and the result
    tfidf_representation = tfidf(all_documents, tokenize)
    our_tfidf_comparisons = []
@@ -264,11 +263,43 @@ def index(KEYWORD):
     textInput=KEYWORD # get the word from the user
     PAGE = choose(textInput)
     if PAGE == "EROR":
-        in_put_fun = documents(textInput)# get it inside the tfidf
+        in_put_fun = documents(textInput,0)# get it inside the tfidf
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
+        title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
+        textOut = textOutPut[1]
+        textOutPut = textOutPut[0].replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
+        if (len(textOutPut.split())) < 330:
+            i=0
+        else:
+            i=1
+        create_name1(textInput, textOut, 1, title)
+        out_put_client = [textOutPut, i, error]
+        return "%s" %(out_put_client)
+    if PAGE == "RE":
+        in_put_fun = documents(textInput,1)# get it inside the tfidf
+        all_documents = in_put_fun[0]
+        error = in_put_fun[1]
+        tokenize = in_put_fun[2]
+        title = in_put_fun[3]
+        textOutPut= algo(all_documents, tokenize) # starts the tf idf
+        textOut = textOutPut[1]
+        textOutPut = textOutPut[0].replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
+        if (len(textOutPut.split())) < 330:
+            i=0
+        else:
+            i=1
+        add_info (textInput, textOut, 1, title, 2)
+        out_put_client = [textOutPut, i, error]
+    else:
+        list_of_info = select(textInput)
+        list_of_info = list_of_info[3]
+        Page = (wikipedia.page(("%s") % (list_of_info)))
+        textOutPut = Page.content
         textOutPut = textOutPut.replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
@@ -277,22 +308,7 @@ def index(KEYWORD):
             i=1
         out_put_client = [textOutPut, i, error]
         return "%s" %(out_put_client)
-    if PAGE == "RE":
-        in_put_fun = documents(textInput)# get it inside the tfidf
-        all_documents = in_put_fun[0]
-        error = in_put_fun[1]
-        tokenize = in_put_fun[2]
-        textOutPut= algo(all_documents, tokenize) # starts the tf idf
-        textOutPut = textOutPut.replace("\n", "")
-        textOutPut = textOutPut.replace("\'", "")
-        if (len(textOutPut.split())) < 330:
-            i=0
-        else:
-            i=1
-        out_put_client = [textOutPut, i, error]
-        
-    else:
-        pass
+
         
         
 
