@@ -7,7 +7,7 @@ import urllib2
 import wikipedia
 import sqlite3
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('example.db')
+conn = sqlite3.connect('example.db', check_same_thread=False)
 c = conn.cursor()
 
 def print_method():
@@ -34,6 +34,7 @@ def update_score(grade, name, which_one):
     
     
 def select(pull):#select data from DB and orgnizing the data
+    print "hey"
     info = (conn.execute(('SELECT * FROM searchr WHERE name = "%s"') % (pull)))
     list_of_info =[]
     for i in info:# getting the info incoded from the temple
@@ -51,11 +52,8 @@ def add_info (name, score2, number2, page2, which):
         pass
      
 def create_name1(name, score1, number1, page1):
-    try:# checks if the name exists
-        c.execute('''INSERT INTO searchr (name, score1, number1, page1) VALUES (?, ?, ?, ?)''',(name, score1, number1, page1))
-        conn.commit()
-    except Exception:
-        pass
+    c.execute('''INSERT INTO searchr (name, score1, number1, page1) VALUES (?, ?, ?, ?)''',(name, score1, number1, page1))
+    conn.commit()
 
 def choose (name):
     try:
@@ -172,7 +170,7 @@ def documents (doc_0, chance):
                 out_put_fun =[all_documents, error, tokenize, title]
                 return out_put_fun
     else:
-        out_put_fun =[all_documents, error, tokenize]
+        out_put_fun =[all_documents, error, tokenize, 1]
         return out_put_fun
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
@@ -261,7 +259,6 @@ app = Flask(__name__)
 @app.route('/SearchEngine/api/v1.1/<string:KEYWORD>', methods=['GET'])
 def index(KEYWORD):
     textInput=KEYWORD # get the word from the user
-    print textInput
     PAGE = choose(textInput)
     if PAGE == "EROR":
         in_put_fun = documents(textInput,0)# get it inside the tfidf
@@ -277,7 +274,7 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        create_name1(textInput, textOut, 1, title)
+        create_name1(textInput, textOut, 1, "orange juice")
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
