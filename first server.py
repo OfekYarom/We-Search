@@ -16,6 +16,10 @@ def print_method():
         for j in i:
             print j
 
+def Create_table():
+    c.execute('''CREATE TABLE searchr
+             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
+
 
 def update_score(grade, name, which_one):
     cell = select(name)
@@ -158,7 +162,7 @@ def documents (doc_0, chance):
                                     if "usually refers to:" not in page_source:
                                         #gets the info from the web page
                                         Page = (wikipedia.page(("%s") % (i)))
-                                        title = Page.title
+                                        title = Page.title #fix
                                         doc_one = Page.content
                                         doc_two = (Page.summary)
                                         all_documents.append (doc_one)
@@ -170,7 +174,7 @@ def documents (doc_0, chance):
                 out_put_fun =[all_documents, error, tokenize, title]
                 return out_put_fun
     else:
-        out_put_fun =[all_documents, error, tokenize, 1]
+        out_put_fun =[all_documents, error, tokenize, 1] #fix
         return out_put_fun
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
@@ -274,7 +278,7 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        create_name1(textInput, textOut, 1, "orange juice")
+        create_name1(textInput, textOut, 1, "orange juice")#fix
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
@@ -294,8 +298,8 @@ def index(KEYWORD):
         add_info (textInput, textOut, 1, title, 2)
         out_put_client = [textOutPut, 2, i, error]
     else:
-        list_of_info = select(textInput)
-        list_of_info = list_of_info[3]
+        list_of_info = select(textInput) #fix
+        list_of_info = list_of_info[3] #fix
         Page = (wikipedia.page(("%s") % (list_of_info)))
         textOutPut = Page.content
         textOutPut = textOutPut.replace("\n", "")
@@ -304,7 +308,7 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        out_put_client = [textOutPut, 1, i, error]
+        out_put_client = [textOutPut, 1, i, 1]
         return "%s" %(out_put_client)
 @app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
 def feedback(THEWORD, THESCORE, WHICH):
