@@ -23,7 +23,7 @@ def Search(): # set up and start the procses of the TF IDF
     global textInput
     global which
     textInput=txt.get()
-    api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.1/%s' % (textInput)
+    api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.0/%s' % (textInput)
     response = requests.get(api_url)
     textOutPut= response.text
     print textOutPut
