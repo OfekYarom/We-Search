@@ -17,9 +17,11 @@ def print_method():
             print j
 
 def Create_table():
-    c.execute('''CREATE TABLE searchr
-             (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
-
+    try:
+        c.execute('''CREATE TABLE searchr
+                 (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
+    except Exception:
+        pass
 
 def update_score(grade, name, which_one):
     cell = select(name)
@@ -38,7 +40,6 @@ def update_score(grade, name, which_one):
     
     
 def select(pull):#select data from DB and orgnizing the data
-    print "hey"
     info = (conn.execute(('SELECT * FROM searchr WHERE name = "%s"') % (pull)))
     list_of_info =[]
     for i in info:# getting the info incoded from the temple
@@ -99,31 +100,24 @@ def documents (doc_0, chance):
     # get the text from wikipedia according to the user input
     # the function is getting the text for each word and for the all input
     error = 0
+    title =[]
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
     document_0 = doc_0
     all_documents = [document_0]
     check_url = ((('https://en.wikipedia.org/wiki/%s') %(doc_0)))
     check_url = check_url.replace(" ", "_")
     try:# checks if web page is working without getting errors
-        urllib.urlopen(check_url)
-    except urllib2.HTTPError, e:
+        #gets the info from the web page
+        Page = (wikipedia.page(("%s") % (doc_0)))
+        title = ((Page.title).append())
+        doc_one = Page.content
+        doc_two = (Page.summary)
+        all_documents.append (doc_one)
+        all_documents.append (doc_two)
+        error = error + 1
+    except Exception:
         pass
-    except urllib2.URLError, e:
-        pass
-    else: # if no eror acourded the program keep runing the web page
-        stat1 = (urllib.urlopen(check_url)).getcode()
-        if stat1 == 200:
-            # if the web page contians info its keep runing.
-            response = (urllib2.urlopen(check_url))
-            page_source = response.read()
-            if "usually refers to:" not in page_source:
-                #gets the info from the web page
-                Page = (wikipedia.page(("%s") % (doc_0)))
-                doc_one = Page.content
-                doc_two = (Page.summary)
-                all_documents.append (doc_one)
-                all_documents.append (doc_two)
-                error = error + 1
+
     splited = doc_0.split()
     if ((len(splited))>1):
         #if the input is built from more than one word
@@ -148,33 +142,25 @@ def documents (doc_0, chance):
                     for i in amount_results:
                         if last == 0:
                             try:# checks if web page is working without getting errors
-                                (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
-                            except urllib2.HTTPError, e:
+                                Page = (wikipedia.page(("%s") % (i)))
+                                title = (Page.title).append()
+                                doc_one = Page.content
+                                doc_two = (Page.summary)
+                                all_documents.append (doc_one)
+                                all_documents.append (doc_two)
+                                error = error + 1
+                                last = last + 1
+                            except Exception:
                                 pass
-                            except urllib2.URLError, e:
-                                pass
-                            else: # if no eror acourding its keep runing the web page
-                                stat1 = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(i)))).getcode()
-                                # if the web page contian info its keep runing.
-                                if stat1 == 200:
-                                    response = (urllib2.urlopen((('https://en.wikipedia.org/wiki/%s') %(i))))
-                                    page_source = response.read()
-                                    if "usually refers to:" not in page_source:
-                                        #gets the info from the web page
-                                        Page = (wikipedia.page(("%s") % (i)))
-                                        title = Page.title #fix
-                                        doc_one = Page.content
-                                        doc_two = (Page.summary)
-                                        all_documents.append (doc_one)
-                                        all_documents.append (doc_two)
-                                        error = error + 1
-                                        last = last + 1
+
+
+
             count = count + 1
             if (((len(splited)) < count)):
                 out_put_fun =[all_documents, error, tokenize, title]
                 return out_put_fun
     else:
-        out_put_fun =[all_documents, error, tokenize, 1] #fix
+        out_put_fun =[all_documents, error, tokenize, title] #fix
         return out_put_fun
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
@@ -222,6 +208,7 @@ def cosine_similarity(vector1, vector2):
 def orgnize_info(our_tfidf_comparisons, all_documents):
     final_match = " "
     best_match = 0
+    number = 0
     second_match = 0
     for z in zip(sorted(our_tfidf_comparisons, reverse = True)):
         
@@ -241,10 +228,11 @@ def orgnize_info(our_tfidf_comparisons, all_documents):
                 if one_result[1] != 0:
                
                     final_match = all_documents[one_result[1]]
+                    number = [one_result[1]]
                 if one_result[2] != 0:
-               
                     final_match =  all_documents[one_result[2]]
-    final = [final_match, best_match]
+                    number = [one_result[2]]
+    final = [final_match, best_match, number]
     return final
 
 def algo (all_documents,tokenize):# combining all the functions to get the formula and the result
@@ -260,8 +248,9 @@ def algo (all_documents,tokenize):# combining all the functions to get the formu
 
 app = Flask(__name__)
 
-@app.route('/SearchEngine/api/v1.1/<string:KEYWORD>', methods=['GET'])
+@app.route('/SearchEngine/api/v1.0/<string:KEYWORD>', methods=['GET'])
 def index(KEYWORD):
+    Create_table()
     textInput=KEYWORD # get the word from the user
     PAGE = choose(textInput)
     if PAGE == "EROR":
@@ -272,16 +261,19 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
+        title = title[textOutPut[2]]
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
             i=0
         else:
             i=1
-        create_name1(textInput, textOut, 1, "orange juice")#fix
+        create_name1(textInput, textOut, 1, title)#fix
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
+        c.execute('select * from searchr')
+        print_method()
         in_put_fun = documents(textInput,1)# get it inside the tfidf
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
@@ -289,6 +281,7 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
+        title = title[textOutPut[2]]
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
@@ -298,10 +291,13 @@ def index(KEYWORD):
         add_info (textInput, textOut, 1, title, 2)
         out_put_client = [textOutPut, 2, i, error]
     else:
-        list_of_info = select(textInput) #fix
-        list_of_info = list_of_info[3] #fix
+        list_of_info = select(textInput)
+        if PAGE == list_of_info[3]:
+            list_of_info == list_of_info[3]
+        else:
+            list_of_info == list_of_info[6]            
         Page = (wikipedia.page(("%s") % (list_of_info)))
-        textOutPut = Page.content
+        textOutPut = Page.summary
         textOutPut = textOutPut.replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
