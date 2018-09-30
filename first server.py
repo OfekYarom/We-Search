@@ -84,7 +84,7 @@ def choose (name):
                 else:
                     PAGE= info[6]
         else:     
-            if ((info[1]) > 0.5):
+            if ((info[1]) > 0.12):
                 PAGE= info[3]
             else:
                 PAGE= "RE"
@@ -102,17 +102,13 @@ def documents (doc_0, chance):
     error = 0
     title =[]
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
-    document_0 = doc_0
-    all_documents = [document_0]
-    check_url = ((('https://en.wikipedia.org/wiki/%s') %(doc_0)))
-    check_url = check_url.replace(" ", "_")
-    
+    all_documents = [doc_0]    
     try:# checks if web page is working without getting errors
         #gets the info from the web page
         Page = (wikipedia.page(("%s") % (doc_0)))
         title.append(Page.title)
         doc_one = Page.content
-        doc_two = (Page.summary)
+        doc_two = Page.summary
         all_documents.append (doc_one)
         all_documents.append (doc_two)
         error = error + 1
@@ -127,7 +123,7 @@ def documents (doc_0, chance):
         while (((len(splited))>= count)):
             word = splited[count-1]
             try:# checks if web page is working without getting errors
-                (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word))))
+                urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)))
             except urllib2.HTTPError, e:
                 pass
             except urllib2.URLError, e:
@@ -229,10 +225,10 @@ def orgnize_info(our_tfidf_comparisons, all_documents):
                 if one_result[1] != 0:
                
                     final_match = all_documents[one_result[1]]
-                    number = [one_result[1]]
+                    number = one_result[1]
                 if one_result[2] != 0:
                     final_match =  all_documents[one_result[2]]
-                    number = [one_result[2]]
+                    number = one_result[2]
     number = number - 1
     final = [final_match, best_match, number]
     return final
@@ -263,15 +259,16 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
-        title = title[textOutPut[2]]
-        textOutPut = textOutPut[0].replace("\n", "")
-        textOutPut = textOutPut.replace("\'", "")
-        if (len(textOutPut.split())) < 330:
+        if (len(textOutPut[0].split())) < 330:
             i=0
         else:
             i=1
-            if (len(textOutPut.split()))  > 2:
-                create_name1(textInput, textOut, 1, title)#fix
+        if (len(textOutPut[0].split()))  > 2:
+            title = title[((textOutPut[2]-1)/2)]
+            which = (textOutPut[2]%2)
+            create_name1(textInput, textOut, 1, title, which)
+        textOutPut = textOutPut[0].replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
@@ -284,7 +281,7 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
-        title = title[textOutPut[2]]
+        title = title[((textOutPut[2]/2)-1)]
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
@@ -296,9 +293,9 @@ def index(KEYWORD):
     else:
         list_of_info = select(textInput)
         if PAGE == list_of_info[3]:
-            list_of_info == list_of_info[3]
+            list_of_info = list_of_info[3]
         else:
-            list_of_info == list_of_info[6]            
+            list_of_info = list_of_info[6]            
         Page = (wikipedia.page(("%s") % (list_of_info)))
         textOutPut = Page.summary
         textOutPut = textOutPut.replace("\n", "")
