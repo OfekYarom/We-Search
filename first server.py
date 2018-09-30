@@ -19,7 +19,7 @@ def print_method():
 def Create_table():
     try:
         c.execute('''CREATE TABLE searchr
-                 (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT, score2 REAL, number2 REAL, page2 TEXT, score3 REAL, number3 REAL, page3 TEXT)''')
+                 (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT,where1 REAL, score2 REAL, number2 REAL, page2 TEXT,where2 REAL, score3 REAL, number3 REAL, page3 TEXT, where3 REAL)''')
     except Exception:
         pass
 
@@ -30,11 +30,11 @@ def update_score(grade, name, which_one):
         number = cell[2]
     else:
         if which_one == 2:
-            score = cell[4]
-            number = cell[5]
+            score = cell[5]
+            number = cell[6]
         else:
-            score = cell[7]
-            number = cell[8]
+            score = cell[9]
+            number = cell[10]
     final_grade = (score*number + grade)/(number+1)
     c.execute('''UPDATE searchr SET score%s=%s WHERE name="%s"''' % (which_one,final_grade, name))
     
@@ -47,52 +47,66 @@ def select(pull):#select data from DB and orgnizing the data
             list_of_info.append(j)
     return list_of_info
 
-def add_info (name, score2, number2, page2, which):
-    try:# checks if the name exists
+def add_info (name, score2, number2, page2, where2):
+    try: # checks if the name exists
         info  = select(name)
-        if info[3] != page2:
-            c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s" WHERE name="%s"''' % (which, score2, which, number2, which, page2, name))
+        if info[3] != page2 and info[7] != page2:
+            if info[7] != None:
+                c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s", where%s=%s WHERE name="%s"''' % (3, score2, 3, number2, 3, page2, 3, where2, name))
+            else:
+                c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s", where%s=%s WHERE name="%s"''' % (2, score2, 2, number2, 2, page2, 2, where2, name))
             conn.commit()
     except Exception:
         pass
-     
-def create_name1(name, score1, number1, page1):
-    c.execute('''INSERT INTO searchr (name, score1, number1, page1) VALUES (?, ?, ?, ?)''',(name, score1, number1, page1))
+def create_name(name, score1, number1, page1, where1):
+    c.execute('''INSERT INTO searchr (name, score1, number1, page1, where1) VALUES (?, ?, ?, ?, ?)''',(name, score1, number1, page1, where1))
     conn.commit()
 
 def choose (name):
     try:
         info  = select(name)
         page1 = info[1]*info[2]
+        size = 1
         if info[6] != None:
+            size = 2
             page2= info[4]*info[5]
-            if info[8] != None:
+            if info[9] != None:
                 page3= info[7]*info[8]
                 if page1>page2:
                     if page1>page3:
+                        best = page1
                         PAGE= info[3]
                     else:
-                        PAGE= info[9]
+                        best = page3
+                        PAGE= info[11]
                 else:
                     if page2>page3:
-                        PAGE= info[6]
+                        best = page2
+                        PAGE= info[7]
                     else:
-                        PAGE= info[9]
+                        best = page3
+                        PAGE= info[11]
             else:
                 if page1>page2:
+                    best = page1
                     PAGE= info[3]
                 else:
-                    PAGE= info[6]
-        else:     
-            if ((info[1]) > 0.12):
-                PAGE= info[3]
-            else:
-                PAGE= "RE"
-        return PAGE
+                    best = page2
+                    PAGE= info[7]
+        else:
+            PAGE = info[3]
+            best = page1
+        if (best > 0.12):
+            pass
+        else:
+            PAGE= "RE"
+        choice =[PAGE, size]
+        return choice
                 
     except Exception:
         PAGE = "EROR"
-        return PAGE
+        choice = [PAGE,0]
+        return choice
     
             
 def documents (doc_0, chance):
@@ -135,6 +149,8 @@ def documents (doc_0, chance):
                     amount_results = (wikipedia.search(("%s") % (word)))
                     if chance == 1:
                         amount_results = amount_results[2:]
+                    if chance == 2:
+                        amount_results = amount_results[4:]
                     last = 0
                     for i in amount_results:
                         if last == 0:
@@ -251,6 +267,8 @@ def index(KEYWORD):
     Create_table()
     textInput=KEYWORD # get the word from the user
     PAGE = choose(textInput)
+    size = PAGE[1]
+    PAGE = PAGE[0]
     if PAGE == "EROR":
         in_put_fun = documents(textInput,0)# get it inside the tfidf
         all_documents = in_put_fun[0]
@@ -265,39 +283,45 @@ def index(KEYWORD):
             i=1
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]
-            which = (textOutPut[2]%2)
-            create_name1(textInput, textOut, 1, title, which)
+            where = (textOutPut[2]%2)
+            create_name(textInput, textOut, 1, title, where)
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
-        c.execute('select * from searchr')
-        print_method()
-        in_put_fun = documents(textInput,1)# get it inside the tfidf
+        in_put_fun = documents(textInput,size)# get it inside the tfidf
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
-        title = title[((textOutPut[2]/2)-1)]
-        textOutPut = textOutPut[0].replace("\n", "")
-        textOutPut = textOutPut.replace("\'", "")
-        if (len(textOutPut.split())) < 330:
+        if (len(textOutPut[0].split())) < 330:
             i=0
         else:
             i=1
-        add_info (textInput, textOut, 1, title, 2)
+        if (len(textOutPut[0].split()))  > 2:
+            title = title[((textOutPut[2]-1)/2)]
+            where = (textOutPut[2]%2)
+            add_info (textInput, textOut, 1, title, where)
+        textOutPut = textOutPut[0].replace("\n", "")
+        textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, 2, i, error]
+        return "%s" %(out_put_client)
     else:
         list_of_info = select(textInput)
         if PAGE == list_of_info[3]:
+            where = list_of_info[4]
             list_of_info = list_of_info[3]
         else:
-            list_of_info = list_of_info[6]            
+            where = list_of_info[8]
+            list_of_info = list_of_info[7]
         Page = (wikipedia.page(("%s") % (list_of_info)))
-        textOutPut = Page.summary
+        if where == 1:
+            textOutPut = Page.summary
+        else:
+            textOutPut = Page.content
         textOutPut = textOutPut.replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         if (len(textOutPut.split())) < 330:
