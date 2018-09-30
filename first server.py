@@ -106,10 +106,11 @@ def documents (doc_0, chance):
     all_documents = [document_0]
     check_url = ((('https://en.wikipedia.org/wiki/%s') %(doc_0)))
     check_url = check_url.replace(" ", "_")
+    
     try:# checks if web page is working without getting errors
         #gets the info from the web page
         Page = (wikipedia.page(("%s") % (doc_0)))
-        title = ((Page.title).append())
+        title.append(Page.title)
         doc_one = Page.content
         doc_two = (Page.summary)
         all_documents.append (doc_one)
@@ -143,7 +144,7 @@ def documents (doc_0, chance):
                         if last == 0:
                             try:# checks if web page is working without getting errors
                                 Page = (wikipedia.page(("%s") % (i)))
-                                title = (Page.title).append()
+                                title.append(Page.title)
                                 doc_one = Page.content
                                 doc_two = (Page.summary)
                                 all_documents.append (doc_one)
@@ -232,6 +233,7 @@ def orgnize_info(our_tfidf_comparisons, all_documents):
                 if one_result[2] != 0:
                     final_match =  all_documents[one_result[2]]
                     number = [one_result[2]]
+    number = number - 1
     final = [final_match, best_match, number]
     return final
 
@@ -268,7 +270,8 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        create_name1(textInput, textOut, 1, title)#fix
+            if (len(textOutPut.split()))  > 2:
+                create_name1(textInput, textOut, 1, title)#fix
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
