@@ -54,7 +54,7 @@ def Send(): # the algorithem for the radio buttons
     X = var.get()
     if (X == 1):
         raise_frame(f3)
-        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"1",which)
+        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"0.24",which)
         response = requests.get(feedback_url)
     if (X == 2):
         raise_frame(f3)
