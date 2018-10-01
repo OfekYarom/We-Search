@@ -149,6 +149,29 @@ def documents (doc_0, chance, deffult):
             error = error + 1
     except Exception:
         pass
+    try:# checks if web page is working without getting errors
+        amount_results = (wikipedia.search(("%s") % (doc_0)))
+        amount_results = amount_results[1:]
+        if chance == 1:
+            amount_results = amount_results[2:]
+        if chance == 2:
+            amount_results = amount_results[4:]
+        last = 0
+        for i in amount_results:
+            if last == 0:
+                try:# checks if web page is working without getting errors
+                    Page = (wikipedia.page(("%s") % (i)))
+                    title.append(Page.title)
+                    doc_one = Page.content
+                    doc_two = (Page.summary)
+                    all_documents.append (doc_one)
+                    all_documents.append (doc_two)
+                    error = error + 1
+                    last = last + 1
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
     splited = doc_0.split()
     if ((len(splited))>1):
@@ -354,8 +377,6 @@ def index(KEYWORD):
 @app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
 def feedback(THEWORD, THESCORE, WHICH):
     update_score(THESCORE, THEWORD, WHICH)
-    PAGE = choose(THEWORD)
-    return "%s" %(PAGE)
     
 
         
