@@ -106,7 +106,7 @@ def choose (name):
             best = page1
         if (best < 0.12 and info[11] == None):
             PAGE= "RE"
-        choice =[PAGE, info, deffult]
+        choice =[PAGE, size, deffult]
         return choice
                 
     except Exception:
@@ -343,6 +343,7 @@ def feedback(THEWORD, THESCORE, WHICH):
     update_score(THESCORE, THEWORD, WHICH)
     PAGE = choose(THEWORD)
     return "%s" %(PAGE)
+    
 
         
         
