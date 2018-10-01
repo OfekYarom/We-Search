@@ -25,6 +25,9 @@ def Create_table():
 
 def update_score(grade, name, which_one):
     cell = select(name)
+    the_grade = grade
+    if the_grade == 1:
+        the_grade = 0.24
     if which_one == 1:#check which of the pages to update         
         score = cell[1]
         number = cell[2]
@@ -35,7 +38,7 @@ def update_score(grade, name, which_one):
         else:
             score = cell[9]
             number = cell[10]
-    final_grade = (score*number + grade)/(number+1)
+    final_grade = (score*number + the_grade)/(number+1)
     number = number + 1
     c.execute('''UPDATE searchr SET score%s=%s,  number%s=%s WHERE name="%s"''' % (which_one,final_grade,which_one,number, name))
     
@@ -106,7 +109,7 @@ def choose (name):
             best = page1
         if (best < 0.12 and info[11] == None):
             PAGE= "RE"
-        choice =[PAGE, size, deffult]
+        choice =[PAGE, size, deffult, info]
         return choice
                 
     except Exception:
@@ -323,8 +326,12 @@ def index(KEYWORD):
             where = list_of_info[4]
             list_of_info = list_of_info[3]
         else:
-            where = list_of_info[8]
-            list_of_info = list_of_info[7]
+            if PAGE == list_of_info[7]:
+                where = list_of_info[8]
+                list_of_info = list_of_info[7]
+            else:
+                where = list_of_info[12]
+                list_of_info = list_of_info[11]
         Page = (wikipedia.page(("%s") % (list_of_info)))
         if where == 1:
             textOutPut = Page.summary
