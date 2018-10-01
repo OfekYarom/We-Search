@@ -36,7 +36,8 @@ def update_score(grade, name, which_one):
             score = cell[9]
             number = cell[10]
     final_grade = (score*number + grade)/(number+1)
-    c.execute('''UPDATE searchr SET score%s=%s WHERE name="%s"''' % (which_one,final_grade, name))
+    number = number + 1
+    c.execute('''UPDATE searchr SET score%s=%s,  number%s=%s WHERE name="%s"''' % (which_one,final_grade,which_one,number, name))
     
     
 def select(pull):#select data from DB and orgnizing the data
@@ -65,13 +66,20 @@ def create_name(name, score1, number1, page1, where1):
 def choose (name):
     try:
         info  = select(name)
-        page1 = info[1]*info[2]
+        page1 = info[1]
         size = 1
+        deffult = 0
+        if info[3].lower() == name:
+            deffult = 1
         if info[6] != None:
             size = 2
-            page2= info[4]*info[5]
+            if info[7].lower() == name:
+                deffult = 1
+            page2= info[5]
             if info[9] != None:
-                page3= info[7]*info[8]
+                if info[11].lower() == name:
+                    deffult = 1    
+                page3= info[9]
                 if page1>page2:
                     if page1>page3:
                         best = page1
@@ -96,20 +104,18 @@ def choose (name):
         else:
             PAGE = info[3]
             best = page1
-        if (best > 0.12):
-            pass
-        else:
+        if (best < 0.12 and info[11] == None):
             PAGE= "RE"
-        choice =[PAGE, size]
+        choice =[PAGE, info, deffult]
         return choice
                 
     except Exception:
         PAGE = "EROR"
-        choice = [PAGE,0]
+        choice = [PAGE,0, 0]
         return choice
     
             
-def documents (doc_0, chance):
+def documents (doc_0, chance, deffult):
     
     # get the text from wikipedia according to the user input
     # the function is getting the text for each word and for the all input
@@ -119,13 +125,14 @@ def documents (doc_0, chance):
     all_documents = [doc_0]    
     try:# checks if web page is working without getting errors
         #gets the info from the web page
-        Page = (wikipedia.page(("%s") % (doc_0)))
-        title.append(Page.title)
-        doc_one = Page.content
-        doc_two = Page.summary
-        all_documents.append (doc_one)
-        all_documents.append (doc_two)
-        error = error + 1
+        if deffult == 0:
+            Page = (wikipedia.page(("%s") % (doc_0)))
+            title.append(Page.title)
+            doc_one = Page.content
+            doc_two = Page.summary
+            all_documents.append (doc_one)
+            all_documents.append (doc_two)
+            error = error + 1
     except Exception:
         pass
 
@@ -268,9 +275,10 @@ def index(KEYWORD):
     textInput=KEYWORD # get the word from the user
     PAGE = choose(textInput)
     size = PAGE[1]
+    deffult = PAGE[2]
     PAGE = PAGE[0]
     if PAGE == "EROR":
-        in_put_fun = documents(textInput,0)# get it inside the tfidf
+        in_put_fun = documents(textInput,0, 0)# get it inside the tfidf
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
@@ -290,7 +298,7 @@ def index(KEYWORD):
         out_put_client = [textOutPut, 1, i, error]
         return "%s" %(out_put_client)
     if PAGE == "RE":
-        in_put_fun = documents(textInput,size)# get it inside the tfidf
+        in_put_fun = documents(textInput,size, deffult)# get it inside the tfidf
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
@@ -333,7 +341,8 @@ def index(KEYWORD):
 @app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
 def feedback(THEWORD, THESCORE, WHICH):
     update_score(THESCORE, THEWORD, WHICH)
-    
+    PAGE = choose(THEWORD)
+    return "%s" %(PAGE)
 
         
         
