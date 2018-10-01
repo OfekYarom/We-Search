@@ -81,40 +81,51 @@ def choose (name):
             page2= info[5]
             if info[9] != None:
                 if info[11].lower() == name:
-                    deffult = 1    
+                    deffult = 1
                 page3= info[9]
                 if page1>page2:
                     if page1>page3:
                         best = page1
                         PAGE= info[3]
+                        iza = 1
                     else:
+                        iza = 3
                         best = page3
                         PAGE= info[11]
                 else:
                     if page2>page3:
                         best = page2
+                        iza = 2
                         PAGE= info[7]
                     else:
                         best = page3
+                        iza = 3
                         PAGE= info[11]
             else:
                 if page1>page2:
+                    iza = 1
                     best = page1
                     PAGE= info[3]
                 else:
+                    iza = 2
                     best = page2
                     PAGE= info[7]
         else:
             PAGE = info[3]
+            iza = 1
             best = page1
         if (best < 0.12 and info[11] == None):
             PAGE= "RE"
-        choice =[PAGE, size, deffult, info]
+            iza = 3
+            if info[7] != None:
+                iza = 2
+            
+        choice =[PAGE, size, deffult, iza, info]
         return choice
                 
     except Exception:
         PAGE = "EROR"
-        choice = [PAGE,0, 0]
+        choice = [PAGE,0, 0, 1]
         return choice
     
             
@@ -279,6 +290,7 @@ def index(KEYWORD):
     PAGE = choose(textInput)
     size = PAGE[1]
     deffult = PAGE[2]
+    iza = PAGE[3]
     PAGE = PAGE[0]
     if PAGE == "EROR":
         in_put_fun = documents(textInput,0, 0)# get it inside the tfidf
@@ -318,7 +330,7 @@ def index(KEYWORD):
             add_info (textInput, textOut, 1, title, where)
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
-        out_put_client = [textOutPut, 2, i, error]
+        out_put_client = [textOutPut, iza, i, error]
         return "%s" %(out_put_client)
     else:
         list_of_info = select(textInput)
@@ -343,7 +355,7 @@ def index(KEYWORD):
             i=0
         else:
             i=1
-        out_put_client = [textOutPut, 1, i, 1]
+        out_put_client = [textOutPut, iza, i, 1]
         return "%s" %(out_put_client)
 @app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
 def feedback(THEWORD, THESCORE, WHICH):
