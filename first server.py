@@ -158,15 +158,6 @@ def documents (doc_0, chance, deffult):
         while (((len(splited))>= count)):
             word = splited[count-1]
             try:# checks if web page is working without getting errors
-                urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)))
-            except urllib2.HTTPError, e:
-                pass
-            except urllib2.URLError, e:
-                pass
-            else: # if no eror acourding its keep runing the web page
-                stat = (urllib.urlopen((('https://en.wikipedia.org/wiki/%s') %(word)))).getcode()
-                # if the web page contians info its keep runing.
-                if stat == 200:
                     amount_results = (wikipedia.search(("%s") % (word)))
                     if chance == 1:
                         amount_results = amount_results[2:]
@@ -186,6 +177,9 @@ def documents (doc_0, chance, deffult):
                                 last = last + 1
                             except Exception:
                                 pass
+            except Exception:
+                pass
+
 
 
 
@@ -194,7 +188,7 @@ def documents (doc_0, chance, deffult):
                 out_put_fun =[all_documents, error, tokenize, title]
                 return out_put_fun
     else:
-        out_put_fun =[all_documents, error, tokenize, title] #fix
+        out_put_fun =[all_documents, error, tokenize, title] 
         return out_put_fun
 
 def sublinear_term_frequency(term, tokenized_document): # getting the term and the docs # calling the function (getting it all togheter)
