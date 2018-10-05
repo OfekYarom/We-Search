@@ -125,11 +125,12 @@ txt.bind('<FocusOut>', focusout)
 txt.config(fg = 'grey')
 btn = Button(f1, text = "Search", command=Search)
 btn.grid(column=1, row=4)
+btn.configure(background='white')
 
 #page two - get Feedback
 var = IntVar()
-lbl_4 = Label(f2, text = "Search Engine", font = ("Arial Bold",size_labels))
-lbl_4.grid(column=1, row = 1, sticky=(W, E))
+lbl_4 = Label(f2, image=symbol)
+lbl_4.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_4.configure(background='white')
 lbl_10 = Label(f2, text = "txt", font = ("Arial Bold",size_of_txt))
 lbl_10.grid(column=1, row = 2, sticky=(W, E))
@@ -151,6 +152,7 @@ rad4.grid(column=1, row=9)
 rad4.configure(background='white')
 btn = Button(f2, text="Send", command=Send)
 btn.grid(column=1, row=10)
+btn.configure(background='white')
 
 #page three - Last Messege
 lbl_5 = Label(f3, text = "Search Engine", font = ("Arial Bold",size_labels))
