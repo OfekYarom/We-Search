@@ -4,8 +4,8 @@ from Tkinter import *
 from PIL import ImageTk, Image
 ###############################   Nurmlzition for text   #############################################################################################
 def text_normal(the_out, the_size):
-    # orgnaizing the text for containing not too much words a line
-    # depends on the amount of text is changing the length of a line and the size of the text.
+    # organizing the text to containing the right amount of words a line.
+    # depends on the amount of text, the loop changes the length of a line and the size of the text.
     i = 0
     full =[]
     for word in (the_out.split()):
@@ -31,39 +31,40 @@ def focusout(event):
         txt.insert(0, 'Looking for info? Type it here and we will find it for you!')
         txt.config(fg = 'grey')
 
-def Search(): # set up and start the procses of the TF IDF
+def Search():#function that gets called whenever Search Button is clicked
+    # set up and contacting the server
     global textInput
     global which
-    textInput=txt.get()
-    api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.0/%s' % (textInput)
-    response = requests.get(api_url)
-    textOutPut= response.text
-    error = int(textOutPut [-2])
-    i = int(textOutPut [-5])
-    which = int(textOutPut [-8])
-    textOutPut = textOutPut[:-11]
-    textOutPut = textOutPut[3:]
-    if i == 0:
+    textInput=txt.get() # gets the text from the entry
+    api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.0/%s' % (textInput) # creating the right URL for the server
+    response = requests.get(api_url) # contacting the server
+    textOutPut= response.text # gets info from the server
+    error = int(textOutPut [-2])# The errors
+    i = int(textOutPut [-5]) # The size of the text
+    which = int(textOutPut [-8]) # Which number is the info in the database    textOutPut = textOutPut[:-11]
+    textOutPut = textOutPut[3:] # The info
+    if i == 0: # set up the size of the text
         the_size = 15
     else:
         the_size = 38
-    textOutPut = text_normal (textOutPut,the_size)
-    lbl_10["text"] = textOutPut # bring the output to the user
+    textOutPut = text_normal (textOutPut,the_size) 
+    lbl_10["text"] = textOutPut # displaying the output to the user
     if error > 0:
         if i==0:
             raise_frame(f2)# opens the next page to show the output
         else:
             raise_frame(f2)# opens the next page to show the output
             lbl_10.config(font=("Arial Bold", alot_of_txt))
-            # depends on the amount of text is changing the length of a line and the size of the text.
+            # depends on the amount of text, changes the length of a line and the size of the text.
     else:
         txt.delete(0, 'end')
         raise_frame(f4)# if no output have found
-    # what to do when Search button clicked
     
-def Send(): # the algorithem for the radio buttons
+    
+def Send():#function that gets called whenever Send(FeedBack) Button is clicked
+    # Radio Button function
     X = var.get()
-    if (X == 1):
+    if (X == 1):# Function sends the server the feedback the user gaved.
         raise_frame(f3)
         txt.delete(0, 'end')
         feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"1",which)
@@ -79,11 +80,11 @@ def Send(): # the algorithem for the radio buttons
     if (X == 4):
         txt.delete(0, 'end')
         raise_frame(f1)
-    # what to do when review button clicked
 
-root = Tk() # creating tk window
+
+root = Tk() # Creating tk window
 root.configure(background='white')
-#creats the components of the pages & the pages
+#Creating the Pages
 f1 = Frame(root)
 f1.configure(background='white')
 f2 = Frame(root)
@@ -92,7 +93,7 @@ f3 = Frame(root)
 f3.configure(background='white')
 f4 = Frame(root)
 f4.configure(background='white')
-# setting the pages size acording to the screen size
+# Setting the pages size acording to the screen size
 screenwidth = root.winfo_screenwidth()
 screenheight = root.winfo_screenheight()
 size_labels = (screenwidth*screenheight)/26200
@@ -104,12 +105,12 @@ x_cordnite = ((screenwidth/2)-(screenwidth/2.6))
 y_cordnite = ((screenheight/2)-screenheight/2.6)
 root.geometry(("%dx%d+%d+%d") %((screenwidth/1.3),(screenheight/1.3),x_cordnite,y_cordnite))
 root.resizable(0, 0)
-root.title("Search Engine") # giving the window a name
+root.title("Search Engine") # The Window Name
 
 for frame in (f1, f2, f3, f4):
     frame.grid(row=0, column=0, sticky='news')
 
-#page one - get Search Word
+#Page one - get Search Word
 symbol=PhotoImage(file="WeSearch.png")
 lbl_0 = Label(f1, image=symbol)
 lbl_0.grid(column=1, row = 1, sticky=(W, E, S))
@@ -127,7 +128,7 @@ btn = Button(f1, text = "Search", command=Search)
 btn.grid(column=1, row=4)
 btn.configure(background='white')
 
-#page two - get Feedback
+#Page two - get Feedback
 var = IntVar()
 lbl_4 = Label(f2, image=symbol)
 lbl_4.grid(column=1, row = 1, sticky=(W, E, S))
@@ -154,7 +155,7 @@ btn = Button(f2, text="Send", command=Send)
 btn.grid(column=1, row=10)
 btn.configure(background='white')
 
-#page three - Last Messege
+#Page three - Thanks You!
 lbl_5 = Label(f3, image=symbol)
 lbl_5.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_5.configure(background='white')
@@ -167,7 +168,7 @@ lbl_7.configure(background='white')
 btn_11 = Button(f3, text="Try Agin", command=(lambda:raise_frame(f1)))
 btn_11.grid(column=1, row=10)
 btn_11.configure(background='white')
-#page Four - Last Messege
+#page Four - Error Page
 lbl_12 = Label(f4, image=symbol)
 lbl_12.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_12.configure(background='white')
