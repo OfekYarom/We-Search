@@ -3,32 +3,26 @@ from flask import Flask
 import string
 import math
 import urllib
-import urllib2
 import wikipedia
 import sqlite3
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('example.db', check_same_thread=False)
+conn = sqlite3.connect('example.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
-def print_method():
-    for i in c:
-        print "\n"
-        for j in i:
-            print j
 
-def Create_table():
+def Create_table(): #Creates the table if the database is empty
     try:
         c.execute('''CREATE TABLE searchr
                  (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT,where1 REAL, score2 REAL, number2 REAL, page2 TEXT,where2 REAL, score3 REAL, number3 REAL, page3 TEXT, where3 REAL)''')
     except Exception:
         pass
 
-def update_score(grade, name, which_one):
-    cell = select(name)
+def update_score(grade, name, which_one):#function that gets called whenever the client gave a feedback
+    cell = select(name) # Gets the info about the Search Name the user is trying to update
     the_grade = grade
     if the_grade == 1:
         the_grade = 0.24
-    if which_one == 1:#check which of the pages to update         
+    if which_one == 1:# Check which of the pages of this search to update         
         score = cell[1]
         number = cell[2]
     else:
@@ -39,20 +33,20 @@ def update_score(grade, name, which_one):
             score = cell[9]
             number = cell[10]
     final_grade = (score*number + the_grade)/(number+1)
-    number = number + 1
-    c.execute('''UPDATE searchr SET score%s=%s,  number%s=%s WHERE name="%s"''' % (which_one,final_grade,which_one,number, name))
+    number = number + 1 # Preparing the stats for the update
+    c.execute('''UPDATE searchr SET score%s=%s,  number%s=%s WHERE name="%s"''' % (which_one,final_grade,which_one,number, name))# Updating the database with the new score
     
     
-def select(pull):#select data from DB and orgnizing the data
+def select(pull):# Selects data from DB and orgnizing the data
     info = (conn.execute(('SELECT * FROM searchr WHERE name = "%s"') % (pull)))
     list_of_info =[]
-    for i in info:# getting the info incoded from the temple
-        for j in i: # decoding the info
+    for i in info:# Getting the info from DB Table
+        for j in i: # Getting the info from the list
             list_of_info.append(j)
     return list_of_info
 
-def add_info (name, score2, number2, page2, where2):
-    try: # checks if the name exists
+def add_info (name, score2, number2, page2, where2):    #function that gets called whenever a New info is added to DB for an existing Search
+    try: # Checks if the name exists
         info  = select(name)
         if info[3] != page2 and info[7] != page2:
             if info[7] != None:
@@ -62,11 +56,11 @@ def add_info (name, score2, number2, page2, where2):
             conn.commit()
     except Exception:
         pass
-def create_name(name, score1, number1, page1, where1):
+def create_name(name, score1, number1, page1, where1):  #function that gets called whenever a New info is added to DB for an New Search
     c.execute('''INSERT INTO searchr (name, score1, number1, page1, where1) VALUES (?, ?, ?, ?, ?)''',(name, score1, number1, page1, where1))
     conn.commit()
 
-def choose (name):
+def choose (name): #Choose the best option for an info request or trying to find new info
     try:
         info  = select(name)
         page1 = info[1]
@@ -137,7 +131,7 @@ def documents (doc_0, chance, deffult):
     title =[]
     tokenize = lambda doc: doc.lower().split(" ") # organizing the text
     all_documents = [doc_0]    
-    try:# checks if web page is working without getting errors
+    try:# checks if web page is working without any errors
         #gets the info from the web page
         if deffult == 0:
             Page = (wikipedia.page(("%s") % (doc_0)))
@@ -149,7 +143,7 @@ def documents (doc_0, chance, deffult):
             error = error + 1
     except Exception:
         pass
-    try:# checks if web page is working without getting errors
+    try:# checks if web page is working without any errors
         amount_results = (wikipedia.search(("%s") % (doc_0)))
         amount_results = amount_results[1:]
         if chance == 1:
@@ -159,7 +153,7 @@ def documents (doc_0, chance, deffult):
         last = 0
         for i in amount_results:
             if last == 0:
-                try:# checks if web page is working without getting errors
+                try:# checks if web page is working without any errors
                     Page = (wikipedia.page(("%s") % (i)))
                     title.append(Page.title)
                     doc_one = Page.content
@@ -180,7 +174,7 @@ def documents (doc_0, chance, deffult):
         count = 1
         while (((len(splited))>= count)):
             word = splited[count-1]
-            try:# checks if web page is working without getting errors
+            try:# checks if web page is working without any errors
                     amount_results = (wikipedia.search(("%s") % (word)))
                     if chance == 1:
                         amount_results = amount_results[2:]
@@ -189,7 +183,7 @@ def documents (doc_0, chance, deffult):
                     last = 0
                     for i in amount_results:
                         if last == 0:
-                            try:# checks if web page is working without getting errors
+                            try:# checks if web page is working without any errors
                                 Page = (wikipedia.page(("%s") % (i)))
                                 title.append(Page.title)
                                 doc_one = Page.content
@@ -202,9 +196,6 @@ def documents (doc_0, chance, deffult):
                                 pass
             except Exception:
                 pass
-
-
-
 
             count = count + 1
             if (((len(splited)) < count)):
@@ -220,13 +211,13 @@ def sublinear_term_frequency(term, tokenized_document): # getting the term and t
        return 0 # if doesnt shown once returning 0
    else:
       return 1 + math.log(count) 
-# if shown retrning the number of times after normalization (log)
+# if shown returning the number of times after normalization (log)
 
 def inverse_document_frequencies(tokenized_documents): # getting a document
     idf_values = {}
-    all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creatung a set of all the terms in all the documents
+    all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creating a set of all the terms in all the documents
     for tkn in all_tokens_set: # for every word
-        contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  moving the terms into a map
+        contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  nurmlizing all words inside the doc
         idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token))) # puts in dictionary the value of each word by dividing the number of times the word appears by the total words
     return idf_values
 
@@ -234,7 +225,7 @@ def inverse_document_frequencies(tokenized_documents): # getting a document
 
 def tfidf(documents, tokenize):
     tokenized_documents = [tokenize(d) for d in documents]# converting the documents to a different format
-    idf = inverse_document_frequencies(tokenized_documents) #putting the value of each word in a varbile by idf
+    idf = inverse_document_frequencies(tokenized_documents) #putting the value of each word in a varbile
     tfidf_documents = []
     for document in tokenized_documents: # for each doc
         doc_tfidf = []
@@ -247,21 +238,20 @@ def tfidf(documents, tokenize):
 
 
 
-
 def cosine_similarity(vector1, vector2):
     dot_product = sum(p*q for p,q in zip(vector1, vector2))# Calculates the sum of the idf and tf
-    magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2])) # put the results in the formula
+    magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2])) # put the results in the Tf Idf Formula
     if not magnitude:
         return 0
     return dot_product/magnitude
-#normalization
+# normalization
 
 def orgnize_info(our_tfidf_comparisons, all_documents):
     final_match = " "
     best_match = 0
     number = 0
     second_match = 0
-    for z in zip(sorted(our_tfidf_comparisons, reverse = True)):
+    for z in zip(sorted(our_tfidf_comparisons, reverse = True)): 
         
       
         for one_result in z: #Receives the value of each adjustment and the relevant documents for the adjustment
@@ -300,22 +290,22 @@ def algo (all_documents,tokenize):# combining all the functions to get the formu
 
 app = Flask(__name__)
 
-@app.route('/SearchEngine/api/v1.0/<string:KEYWORD>', methods=['GET'])
-def index(KEYWORD):
+@app.route('/SearchEngine/api/v1.0/<string:KEYWORD>', methods=['GET']) # Handling an info request from the client
+def index(KEYWORD): 
     Create_table()
     textInput=KEYWORD # get the word from the user
-    PAGE = choose(textInput)
+    PAGE = choose(textInput) # Checking the DB and deciding which work pattern is the best for every request
     size = PAGE[1]
     deffult = PAGE[2]
     iza = PAGE[3]
     PAGE = PAGE[0]
-    if PAGE == "EROR":
-        in_put_fun = documents(textInput,0, 0)# get it inside the tfidf
+    if PAGE == "EROR": # If No info is exists about the search
+        in_put_fun = documents(textInput,0, 0)# Getting info and preparing for the TF IDF
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
         title = in_put_fun[3]
-        textOutPut= algo(all_documents, tokenize) # starts the tf idf
+        textOutPut= algo(all_documents, tokenize) # Starts the tf idf
         textOut = textOutPut[1]
         if (len(textOutPut[0].split())) < 330:
             i=0
@@ -323,14 +313,14 @@ def index(KEYWORD):
             i=1
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]
-            where = (textOutPut[2]%2)
-            create_name(textInput, textOut, 1, title, where)
+            where = (textOutPut[2]%2) #  Gets info about the text
+            create_name(textInput, textOut, 1, title, where) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, 1, i, error]
-        return "%s" %(out_put_client)
-    if PAGE == "RE":
-        in_put_fun = documents(textInput,size, deffult)# get it inside the tfidf
+        return "%s" %(out_put_client) # Returns it to the client
+    if PAGE == "RE": # if the info existing in the DB isn't good enough
+        in_put_fun = documents(textInput,size, deffult)# Getting info and preparing for the TF IDF
         all_documents = in_put_fun[0]
         error = in_put_fun[1]
         tokenize = in_put_fun[2]
@@ -342,15 +332,15 @@ def index(KEYWORD):
         else:
             i=1
         if (len(textOutPut[0].split()))  > 2:
-            title = title[((textOutPut[2]-1)/2)]
+            title = title[((textOutPut[2]-1)/2)]# Gets info about the text
             where = (textOutPut[2]%2)
-            add_info (textInput, textOut, 1, title, where)
+            add_info (textInput, textOut, 1, title, where)# updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, iza, i, error]
-        return "%s" %(out_put_client)
-    else:
-        list_of_info = select(textInput)
+        return "%s" %(out_put_client) # Returns it to the client
+    else: # If great info existing in DB
+        list_of_info = select(textInput) 
         if PAGE == list_of_info[3]:
             where = list_of_info[4]
             list_of_info = list_of_info[3]
@@ -361,7 +351,7 @@ def index(KEYWORD):
             else:
                 where = list_of_info[12]
                 list_of_info = list_of_info[11]
-        Page = (wikipedia.page(("%s") % (list_of_info)))
+        Page = (wikipedia.page(("%s") % (list_of_info))) # Gets the full info from the web
         if where == 1:
             textOutPut = Page.summary
         else:
@@ -373,10 +363,10 @@ def index(KEYWORD):
         else:
             i=1
         out_put_client = [textOutPut, iza, i, 1]
-        return "%s" %(out_put_client)
+        return "%s" %(out_put_client) # Returns it to the client
 @app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
-def feedback(THEWORD, THESCORE, WHICH):
-    update_score(THESCORE, THEWORD, WHICH)
+def feedback(THEWORD, THESCORE, WHICH): # Getting the client feedback about the info
+    update_score(THESCORE, THEWORD, WHICH) # Updating the score of the search info
     
 
         
