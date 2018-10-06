@@ -13,6 +13,6 @@ Although Python 2.7X is supported as well it is strongly recommended to use the 
 - wikipedia 1.4.0 version.
 
 ## Tests ##
-To check the usefulness of the project, simply type an expression, a good expression to test the engine is "Orange Juice", than wait for the result, and give your feedback, and search the same expression agin, the result will be affected by your feedback, and should appear alot faster.
+To check the usefulness of the project, simply type an expression, a good expression to test the engine is "Orange Juice", than wait for the result, and give your feedback, afterwards search the same expression agin, the result will be affected by your feedback, and should appear alot faster.
 
 
