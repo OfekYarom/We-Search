@@ -20,6 +20,7 @@ def text_normal(the_out, the_size):
 
 def raise_frame(frame): # function for raising pages
     frame.tkraise()
+    
 def on_click(event):
     #function that gets called whenever entry is clicked
     if txt.cget('fg') == 'grey':
@@ -112,8 +113,11 @@ for frame in (f1, f2, f3, f4):
     frame.grid(row=0, column=0, sticky='news')
 
 #Page one - get Search Word
-symbol=PhotoImage(file="WeSearch.png")
-lbl_0 = Label(f1, image=symbol)
+try:
+    symbol=PhotoImage(file="WeSearch.png")
+    lbl_0 = Label(f1, image=symbol)
+except Exception:
+    lbl_0 = Label(f1, text = "SearchEngine", font = ("Arial Bold",size_smalllabels*2))
 lbl_0.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_0.configure(background='white')
 lbl_1 = Label(f1, text = "Looking for info? Type it here and we will find it for you!", font = ("Arial Bold",size_smalllabels))
@@ -131,7 +135,10 @@ btn.configure(background='white')
 
 #Page two - get Feedback
 var = IntVar()
-lbl_4 = Label(f2, image=symbol)
+try:
+    lbl_4 = Label(f2, image=symbol)
+except Exception:
+    lbl_4 = Label(f2, text = "SearchEngine", font = ("Arial Bold",size_smalllabels*2))
 lbl_4.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_4.configure(background='white')
 lbl_17 = Label(f2, text = "Looking for info? Type it here and we will find it for you!", font = ("Arial Bold",int(size_smalllabels)))
@@ -160,7 +167,10 @@ btn.grid(column=1, row=10)
 btn.configure(background='white')
 
 #Page three - Thanks You!
-lbl_5 = Label(f3, image=symbol)
+try:
+    lbl_5 = Label(f3, image=symbol)
+except Exception:
+    lbl_5 = Label(f3, text = "SearchEngine", font = ("Arial Bold",size_smalllabels*2))
 lbl_5.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_5.configure(background='white')
 lbl_6 = Label(f3, text = "Thank You For Helping Us Improve!", font = ("Arial Bold",int(size_labels/1.26)))
@@ -173,7 +183,10 @@ btn_11 = Button(f3, text="Try Agin", command=(lambda:raise_frame(f1)))
 btn_11.grid(column=1, row=10)
 btn_11.configure(background='white')
 #page Four - Error Page
-lbl_12 = Label(f4, image=symbol)
+try:
+    lbl_12 = Label(f4, image=symbol)
+except Exception:
+    lbl_12 = Label(f4, text = "SearchEngine", font = ("Arial Bold",size_smalllabels*2))
 lbl_12.grid(column=1, row = 1, sticky=(W, E, S))
 lbl_12.configure(background='white')
 lbl_13 = Label(f4, text = "Error Occurred", font = ("Arial Bold",size_labels))
