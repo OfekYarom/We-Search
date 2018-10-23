@@ -11,6 +11,15 @@ Although Python 2.7X is supported as well it is strongly recommended to use the 
 
 ### System requirements ###
 - wikipedia 1.4.0 version.
+- requests 2.18.4 version.
+- Flask 0.12.2 version.
+- Pillow 5.3.0 version.
+
+
+requests==2.18.4
+Flask==0.12.2
+wikipedia==1.4.0
+Pillow==5.3.0
 
 ## Tests ##
 To check the usefulness of the project, simply type an expression, a good expression to test the engine is "Orange Juice", than wait for the result, and give your feedback, afterwards, search the same expression agin, the result will be affected by your feedback, and should appear alot faster.
