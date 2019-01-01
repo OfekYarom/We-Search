@@ -36,14 +36,14 @@ def Search():#function that gets called whenever Search Button is clicked
     # set up and contacting the server
     global textInput
     global which
-    textInput=txt.get() # gets the text from the entry
+    textInput=(txt.get()).lower() # gets the text from the entry
     api_url = 'http://127.0.0.1:5000/SearchEngine/api/v1.0/%s' % (textInput) # creating the right URL for the server
     response = requests.get(api_url) # contacting the server
     textOutPut= response.text # gets info from the server
     error = int(textOutPut [-2])# The errors
     i = int(textOutPut [-5]) # The size of the text
     which = textOutPut [-39:-8] # Which number is the info in the database
-    textOutPut = textOutPut[3:-40] # The info
+    textOutPut = textOutPut[3:-43] # The info
     if i == 0: # set up the size of the text
         the_size = 15
     else:
