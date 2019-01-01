@@ -301,6 +301,7 @@ def index(KEYWORD):
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, ID, i, error]
+        return str(select_all("orange"))
         return "%s" %(out_put_client) # Returns it to the client
     else: # If great info existing in DB
         list_of_info = select_one(iza) 
