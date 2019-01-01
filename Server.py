@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('example.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('d.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
@@ -45,7 +45,7 @@ def CREATE_ID():  #function that create an uniqe id for each item in DB
     return ID
 
 def create_name(ID, SearchName , Score, Page, Place):  #function that gets called whenever a New info is added to DB for an New Search
-    c.execute('''INSERT INTO Searches (ID, SearchName , Score, Number, Page, Place) VALUES (?, ?, ?, ?, ?, ?)''',(ID, SearchName , Score, 1, Page, Place))
+    c.execute('''INSERT INTO Searches (ID, SearchName , Score, Number, Page, Place) VALUES (?, ?, ?, ?, ?, ?)''',(ID, SearchName , Score, 5, Page, Place))
     conn.commit()
 
 def update_score(Score, ID):#function that gets called whenever the client gave a feedback
@@ -68,17 +68,16 @@ def choose (SearchName): #Choose the best option for an info request or trying t
             if (score < cell[(amount_of_info*6-4)]):
                 score = cell[(amount_of_info*6-4)]
                 PAGE = cell[(amount_of_info*6-2)]
-                ID = cell[(amount_of_info*6-7)]
+                ID = cell[(amount_of_info*6-6)]
                 if (PAGE.lower() == SearchName):
                     deffult = 1
-                    
+            
             amount_of_info = amount_of_info - 1
             
             choice =[PAGE, (len(cell)/6), deffult, ID]
-        if (score < 0.5):
+        if (score < 0.05):
             choice =["RE", (len(cell)/6), deffult, 0]
         return choice
-                
     except Exception:
         choice = ["EROR",0, 0, 0]
         return choice
@@ -107,10 +106,7 @@ def documents (doc_0, chance, deffult):
     try:# checks if web page is working without any errors
         amount_results = (wikipedia.search(("%s") % (doc_0)))
         amount_results = amount_results[1:]
-        if chance == 1:
-            amount_results = amount_results[2:]
-        if chance == 2:
-            amount_results = amount_results[4:]
+        amount_results = amount_results[(2*chance):]
         last = 0
         for i in amount_results:
             if last == 0:
@@ -137,10 +133,7 @@ def documents (doc_0, chance, deffult):
             word = splited[count-1]
             try:# checks if web page is working without any errors
                     amount_results = (wikipedia.search(("%s") % (word)))
-                    if chance == 1:
-                        amount_results = amount_results[2:]
-                    if chance == 2:
-                        amount_results = amount_results[4:]
+                    amount_results = amount_results[(2*chance):]
                     last = 0
                     for i in amount_results:
                         if last == 0:
@@ -252,7 +245,7 @@ def algo (all_documents,tokenize):# combining all the functions to get the formu
 app = Flask(__name__)
 
 @app.route('/SearchEngine/api/v1.0/<string:KEYWORD>', methods=['GET']) # Handling an info request from the client
-def index(KEYWORD): 
+def index(KEYWORD):
     Create_table()
     textInput=KEYWORD # get the word from the user
     PAGE = choose(textInput) # Checking the DB and deciding which work pattern is the best for every request
@@ -268,6 +261,7 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # Starts the tf idf
         textOut = textOutPut[1]
+        ID= CREATE_ID()
         if (len(textOutPut[0].split())) < 330:
             i=0
         else:
@@ -275,7 +269,6 @@ def index(KEYWORD):
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]
             where = (textOutPut[2]%2) #  Gets info about the text
-            ID = CREATE_ID()
             create_name(ID ,textInput, textOut, title, where) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
@@ -289,6 +282,7 @@ def index(KEYWORD):
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # starts the tf idf
         textOut = textOutPut[1]
+        ID = CREATE_ID()
         if (len(textOutPut[0].split())) < 330:
             i=0
         else:
@@ -296,16 +290,15 @@ def index(KEYWORD):
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]# Gets info about the text
             where = (textOutPut[2]%2)
-            ID = CREATE_ID()
             create_name(ID ,textInput, textOut, title, where) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, ID, i, error]
-        return str(select_all("orange"))
         return "%s" %(out_put_client) # Returns it to the client
     else: # If great info existing in DB
-        list_of_info = select_one(iza) 
+        list_of_info = select_one(iza)
         Page = (wikipedia.page(("%s") % (list_of_info[4]))) # Gets the full info from the web
+        where = list_of_info[5]
         if where == 1:
             textOutPut = Page.summary
         else:
