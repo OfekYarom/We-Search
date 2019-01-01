@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('d.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('DB.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
