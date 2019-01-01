@@ -5,121 +5,82 @@ import math
 import urllib
 import wikipedia
 import sqlite3
+import uuid
 ###############################    TF - IDF   #################################################################################################
 conn = sqlite3.connect('example.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
+
 def Create_table(): #Creates the table if the database is empty
     try:
-        c.execute('''CREATE TABLE searchr
-                 (name TEXT PRIMARY KEY, score1 REAL, number1 REAL, page1 TEXT,where1 REAL, score2 REAL, number2 REAL, page2 TEXT,where2 REAL, score3 REAL, number3 REAL, page3 TEXT, where3 REAL)''')
+        c.execute('''CREATE TABLE Searches
+                         (ID TEXT PRIMARY KEY,SearchName TEXT, Score REAL, Number REAL, Page TEXT, Place REAL)''')
     except Exception:
         pass
 
-def update_score(grade, name, which_one):#function that gets called whenever the client gave a feedback
-    cell = select(name) # Gets the info about the Search Name the user is trying to update
-    the_grade = grade
-    if the_grade == 1:
-        the_grade = 0.24
-    if which_one == 1:# Check which of the pages of this search to update         
-        score = cell[1]
-        number = cell[2]
-    else:
-        if which_one == 2:
-            score = cell[5]
-            number = cell[6]
-        else:
-            score = cell[9]
-            number = cell[10]
-    final_grade = (score*number + the_grade)/(number+1)
-    number = number + 1 # Preparing the stats for the update
-    c.execute('''UPDATE searchr SET score%s=%s,  number%s=%s WHERE name="%s"''' % (which_one,final_grade,which_one,number, name))# Updating the database with the new score
-    
-    
-def select(pull):# Selects data from DB and orgnizing the data
-    info = (conn.execute(('SELECT * FROM searchr WHERE name = "%s"') % (pull)))
+def select_all(pull):# Selects data from DB and orgnizing the data
+    info = (conn.execute(('SELECT * FROM Searches WHERE SearchName = "%s"') % (pull)))
     list_of_info =[]
-    for i in info:# Getting the info from DB Table
+    for i in info:# Getting the info from SearchesDB Table
         for j in i: # Getting the info from the list
             list_of_info.append(j)
     return list_of_info
 
-def add_info (name, score2, number2, page2, where2):    #function that gets called whenever a New info is added to DB for an existing Search
-    try: # Checks if the name exists
-        info  = select(name)
-        if info[3] != page2 and info[7] != page2:
-            if info[7] != None:
-                c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s", where%s=%s WHERE name="%s"''' % (3, score2, 3, number2, 3, page2, 3, where2, name))
-            else:
-                c.execute('''UPDATE searchr SET score%s=%s, number%s=%s, page%s="%s", where%s=%s WHERE name="%s"''' % (2, score2, 2, number2, 2, page2, 2, where2, name))
-            conn.commit()
+def select_one(ID):# Selects data from DB and orgnizing the data
+    info = (conn.execute(('SELECT * FROM Searches WHERE ID = "%s"') % (ID)))
+    list_of_info =[]
+    for i in info:# Getting the info from SearchesDB Table
+        for j in i: # Getting the info from the list
+            list_of_info.append(j)
+    return list_of_info
+
+def CREATE_ID():  #function that create an uniqe id for each item in DB
+    ID=str(uuid.uuid4()).replace('-','')
+    try:
+        select_one(ID)
+        ID=str(uuid.uuid4()).replace('-','')
     except Exception:
         pass
-def create_name(name, score1, number1, page1, where1):  #function that gets called whenever a New info is added to DB for an New Search
-    c.execute('''INSERT INTO searchr (name, score1, number1, page1, where1) VALUES (?, ?, ?, ?, ?)''',(name, score1, number1, page1, where1))
+    return ID
+
+def create_name(ID, SearchName , Score, Page, Place):  #function that gets called whenever a New info is added to DB for an New Search
+    c.execute('''INSERT INTO Searches (ID, SearchName , Score, Number, Page, Place) VALUES (?, ?, ?, ?, ?, ?)''',(ID, SearchName , Score, 1, Page, Place))
     conn.commit()
 
-def choose (name): #Choose the best option for an info request or trying to find new info
+def update_score(Score, ID):#function that gets called whenever the client gave a feedback
+    cell = select_one(ID) # Gets the info about the Search Name the user is trying to update
+    the_grade = Score
+    if the_grade == 1:
+        the_grade = 0.24
+    NewScore = (cell[2]*cell[3] + Score)/(cell[3]+1)
+    c.execute('''UPDATE Searches SET score=%s,  number=%s WHERE ID="%s"''' % (NewScore, (cell[3]+1), ID))# Updating the database with the new score
+    conn.commit()
+    
+def choose (SearchName): #Choose the best option for an info request or trying to find new info
     try:
-        info  = select(name)
-        page1 = info[1]
-        size = 1
+        cell = select_all(SearchName)
+        amount_of_info = len(cell)/6
+        size = len(cell)/6
+        score = 0
         deffult = 0
-        if info[3].lower() == name:
-            deffult = 1
-        if info[6] != None:
-            size = 2
-            if info[7].lower() == name:
-                deffult = 1
-            page2= info[5]
-            if info[9] != None:
-                if info[11].lower() == name:
+        while(amount_of_info != 0):
+            if (score < cell[(amount_of_info*6-4)]):
+                score = cell[(amount_of_info*6-4)]
+                PAGE = cell[(amount_of_info*6-2)]
+                ID = cell[(amount_of_info*6-7)]
+                if (PAGE.lower() == SearchName):
                     deffult = 1
-                page3= info[9]
-                if page1>page2:
-                    if page1>page3:
-                        best = page1
-                        PAGE= info[3]
-                        iza = 1
-                    else:
-                        iza = 3
-                        best = page3
-                        PAGE= info[11]
-                else:
-                    if page2>page3:
-                        best = page2
-                        iza = 2
-                        PAGE= info[7]
-                    else:
-                        best = page3
-                        iza = 3
-                        PAGE= info[11]
-            else:
-                if page1>page2:
-                    iza = 1
-                    best = page1
-                    PAGE= info[3]
-                else:
-                    iza = 2
-                    best = page2
-                    PAGE= info[7]
-        else:
-            PAGE = info[3]
-            iza = 1
-            best = page1
-        if (best < 0.12 and info[11] == None):
-            PAGE= "RE"
-            iza = 3
-            if info[7] != None:
-                iza = 2
+                    
+            amount_of_info = amount_of_info - 1
             
-        choice =[PAGE, size, deffult, iza, info]
+            choice =[PAGE, (len(cell)/6), deffult, ID]
+        if (score < 0.5):
+            choice =["RE", (len(cell)/6), deffult, 0]
         return choice
                 
     except Exception:
-        PAGE = "EROR"
-        choice = [PAGE,0, 0, 1]
+        choice = ["EROR",0, 0, 0]
         return choice
     
             
@@ -314,10 +275,11 @@ def index(KEYWORD):
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]
             where = (textOutPut[2]%2) #  Gets info about the text
-            create_name(textInput, textOut, 1, title, where) #updating the DB 
+            ID = CREATE_ID()
+            create_name(ID ,textInput, textOut, title, where) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
-        out_put_client = [textOutPut, 1, i, error]
+        out_put_client = [textOutPut, ID, i, error]
         return "%s" %(out_put_client) # Returns it to the client
     if PAGE == "RE": # if the info existing in the DB isn't good enough
         in_put_fun = documents(textInput,size, deffult)# Getting info and preparing for the TF IDF
@@ -334,24 +296,15 @@ def index(KEYWORD):
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]# Gets info about the text
             where = (textOutPut[2]%2)
-            add_info (textInput, textOut, 1, title, where)# updating the DB 
+            ID = CREATE_ID()
+            create_name(ID ,textInput, textOut, title, where) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
-        out_put_client = [textOutPut, iza, i, error]
+        out_put_client = [textOutPut, ID, i, error]
         return "%s" %(out_put_client) # Returns it to the client
     else: # If great info existing in DB
-        list_of_info = select(textInput) 
-        if PAGE == list_of_info[3]:
-            where = list_of_info[4]
-            list_of_info = list_of_info[3]
-        else:
-            if PAGE == list_of_info[7]:
-                where = list_of_info[8]
-                list_of_info = list_of_info[7]
-            else:
-                where = list_of_info[12]
-                list_of_info = list_of_info[11]
-        Page = (wikipedia.page(("%s") % (list_of_info))) # Gets the full info from the web
+        list_of_info = select_one(iza) 
+        Page = (wikipedia.page(("%s") % (list_of_info[4]))) # Gets the full info from the web
         if where == 1:
             textOutPut = Page.summary
         else:
@@ -364,9 +317,9 @@ def index(KEYWORD):
             i=1
         out_put_client = [textOutPut, iza, i, 1]
         return "%s" %(out_put_client) # Returns it to the client
-@app.route('/SearchEngine/feedback/v1.1/<string:THEWORD>/<int:THESCORE>/<int:WHICH>', methods=['GET'])
-def feedback(THEWORD, THESCORE, WHICH): # Getting the client feedback about the info
-    update_score(THESCORE, THEWORD, WHICH) # Updating the score of the search info
+@app.route('/SearchEngine/feedback/v1.1/<string:ID>/<int:THESCORE>', methods=['GET'])
+def feedback(ID, THESCORE): # Getting the client feedback about the info
+    update_score(THESCORE, ID) # Updating the score of the search info
     
 
         
