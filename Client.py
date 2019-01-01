@@ -42,9 +42,8 @@ def Search():#function that gets called whenever Search Button is clicked
     textOutPut= response.text # gets info from the server
     error = int(textOutPut [-2])# The errors
     i = int(textOutPut [-5]) # The size of the text
-    which = int(textOutPut [-8]) # Which number is the info in the database
-    textOutPut = textOutPut[:-11]
-    textOutPut = textOutPut[3:] # The info
+    which = textOutPut [-39:-8] # Which number is the info in the database
+    textOutPut = textOutPut[3:-40] # The info
     if i == 0: # set up the size of the text
         the_size = 15
     else:
@@ -69,12 +68,12 @@ def Send():#function that gets called whenever Send(FeedBack) Button is clicked
     if (X == 1):# Function sends the server the feedback the user gaved.
         raise_frame(f3)
         txt.delete(0, 'end')
-        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"1",which)
+        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s' % (which,"1")
         response = requests.get(feedback_url)
     if (X == 2):
         txt.delete(0, 'end')
         raise_frame(f3)
-        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s/%s' % (textInput,"0",which)
+        feedback_url = 'http://127.0.0.1:5000/SearchEngine/feedback/v1.1/%s/%s' % (which,"0")
         response = requests.get(feedback_url)
     if (X == 3):
         txt.delete(0, 'end')
