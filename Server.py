@@ -75,7 +75,7 @@ def choose (SearchName): #Choose the best option for an info request or trying t
             amount_of_info = amount_of_info - 1
             
             choice =[PAGE, (len(cell)/6), deffult, ID]
-            if (score < 0.05):
+            if (score < 0.09):
                 choice =["RE", (len(cell)/6), deffult, 0]
         return choice
     except Exception:
