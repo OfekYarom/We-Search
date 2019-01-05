@@ -45,7 +45,7 @@ def CREATE_ID():  #function that create an uniqe id for each item in DB
     return ID
 
 def create_name(ID, SearchName , Score, Page, Place):  #function that gets called whenever a New info is added to DB for an New Search
-    c.execute('''INSERT INTO Searches (ID, SearchName , Score, Number, Page, Place) VALUES (?, ?, ?, ?, ?, ?)''',(ID, SearchName , Score, 2, Page, Place))
+    c.execute('''INSERT INTO Searches (ID, SearchName , Score, Number, Page, Place) VALUES (?, ?, ?, ?, ?, ?)''',(ID, SearchName , Score, 1, Page, Place))
     conn.commit()
 
 def update_score(Score, ID):#function that gets called whenever the client gave a feedback
