@@ -42,7 +42,7 @@ def Search():#function that gets called whenever Search Button is clicked
     textOutPut= response.text # gets info from the server
     error = int(textOutPut [-2])# The errors
     i = int(textOutPut [-5]) # The size of the text
-    which = textOutPut [-39:-8] # Which number is the info in the database
+    which = textOutPut [-40:-8] # Which number is the info in the database
     textOutPut = textOutPut[3:-43] # The info
     if i == 0: # set up the size of the text
         the_size = 15
