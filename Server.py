@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('DB.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('db.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
@@ -52,7 +52,7 @@ def update_score(Score, ID):#function that gets called whenever the client gave 
     cell = select_one(ID) # Gets the info about the Search Name the user is trying to update
     the_grade = Score
     if the_grade == 1:
-        the_grade = 0.24
+        the_grade = 0.12
     NewScore = (cell[2]*cell[3] + Score)/(cell[3]+1)
     c.execute('''UPDATE Searches SET score=%s,  number=%s WHERE ID="%s"''' % (NewScore, (cell[3]+1), ID))# Updating the database with the new score
     conn.commit()
@@ -75,7 +75,7 @@ def choose (SearchName): #Choose the best option for an info request or trying t
             amount_of_info = amount_of_info - 1
             
             choice =[PAGE, (len(cell)/6), deffult, ID]
-            if (score < 0.09):
+            if (score < 0.06):
                 choice =["RE", (len(cell)/6), deffult, 0]
         return choice
     except Exception:
