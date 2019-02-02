@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('d.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('db.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
@@ -252,7 +252,7 @@ def index(KEYWORD):
     if PAGE == "EROR": # If No info is exists about the search
         in_put_fun = documents(textInput,0, 0)# Getting info and preparing for the TF IDF
         all_documents = in_put_fun[0]
-        error = in_put_fun[1
+        error = in_put_fun[1]
         tokenize = in_put_fun[2]
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # Starts the tf idf
