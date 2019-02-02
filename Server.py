@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('db.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('d.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
@@ -96,9 +96,7 @@ def documents (doc_0, chance, deffult):
         if deffult == 0:
             Page = (wikipedia.page(("%s") % (doc_0)))
             title.append(Page.title)
-            doc_one = Page.content
             doc_two = Page.summary
-            all_documents.append (doc_one)
             all_documents.append (doc_two)
             error = error + 1
     except Exception:
@@ -113,9 +111,7 @@ def documents (doc_0, chance, deffult):
                 try:# checks if web page is working without any errors
                     Page = (wikipedia.page(("%s") % (i)))
                     title.append(Page.title)
-                    doc_one = Page.content
                     doc_two = (Page.summary)
-                    all_documents.append (doc_one)
                     all_documents.append (doc_two)
                     error = error + 1
                     last = last + 1
@@ -140,9 +136,7 @@ def documents (doc_0, chance, deffult):
                             try:# checks if web page is working without any errors
                                 Page = (wikipedia.page(("%s") % (i)))
                                 title.append(Page.title)
-                                doc_one = Page.content
                                 doc_two = (Page.summary)
-                                all_documents.append (doc_one)
                                 all_documents.append (doc_two)
                                 error = error + 1
                                 last = last + 1
@@ -169,6 +163,7 @@ def sublinear_term_frequency(term, tokenized_document): # getting the term and t
 
 def inverse_document_frequencies(tokenized_documents): # getting a document
     idf_values = {}
+    tokk = tokenized_documents[0]
     all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creating a set of all the terms in all the documents
     for tkn in all_tokens_set: # for every word
         contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  nurmlizing all words inside the doc
@@ -193,11 +188,10 @@ def tfidf(documents, tokenize):
 
 
 def cosine_similarity(vector1, vector2):
-    dot_product = sum(p*q for p,q in zip(vector1, vector2))# Calculates the sum of the idf and tf
     magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2])) # put the results in the Tf Idf Formula
     if not magnitude:
         return 0
-    return dot_product/magnitude
+    return magnitude
 # normalization
 
 def orgnize_info(our_tfidf_comparisons, all_documents):
@@ -214,7 +208,7 @@ def orgnize_info(our_tfidf_comparisons, all_documents):
             
                 for solo in one_result: # Receives all entries in a single configuration
                
-                    if (solo < 0.999999 and solo != 0): # Filtering everything that is not the matching value
+                    if (solo != 0): # Filtering everything that is not the matching value
                   
                         if solo > best_match: # Checks what is the best match and stores it
                             best_match = solo
@@ -232,12 +226,14 @@ def orgnize_info(our_tfidf_comparisons, all_documents):
     return final
 
 def algo (all_documents,tokenize):# combining all the functions to get the formula and the result
-   tfidf_representation = tfidf(all_documents, tokenize)
-   our_tfidf_comparisons = []
-   for count_0, doc_0 in enumerate(tfidf_representation):
-       for count_1, doc_1 in enumerate(tfidf_representation):
-           our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
-   return orgnize_info(our_tfidf_comparisons, all_documents)
+    tfidf_representation = tfidf(all_documents, tokenize)
+    trys = []
+    our_tfidf_comparisons = []
+    for count_0, doc_0 in enumerate(tfidf_representation):
+        for count_1, doc_1 in enumerate(tfidf_representation):
+            trys.append([doc_0, doc_1])
+            our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
+    return orgnize_info(our_tfidf_comparisons, all_documents)
 # doing this process for each doc
 
 ###############################   FLASK   #############################################################################################
@@ -256,7 +252,7 @@ def index(KEYWORD):
     if PAGE == "EROR": # If No info is exists about the search
         in_put_fun = documents(textInput,0, 0)# Getting info and preparing for the TF IDF
         all_documents = in_put_fun[0]
-        error = in_put_fun[1]
+        error = in_put_fun[1
         tokenize = in_put_fun[2]
         title = in_put_fun[3]
         textOutPut= algo(all_documents, tokenize) # Starts the tf idf
@@ -268,8 +264,7 @@ def index(KEYWORD):
             i=1
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]
-            where = (textOutPut[2]%2) #  Gets info about the text
-            create_name(ID ,textInput, textOut, title, where) #updating the DB 
+            create_name(ID ,textInput, textOut, title, 1) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, ID, i, error]
@@ -289,8 +284,7 @@ def index(KEYWORD):
             i=1
         if (len(textOutPut[0].split()))  > 2:
             title = title[((textOutPut[2]-1)/2)]# Gets info about the text
-            where = (textOutPut[2]%2)
-            create_name(ID ,textInput, textOut, title, where) #updating the DB 
+            create_name(ID ,textInput, textOut, title, 1) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
         out_put_client = [textOutPut, ID, i, error]
