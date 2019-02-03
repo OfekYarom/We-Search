@@ -7,7 +7,7 @@ import wikipedia
 import sqlite3
 import uuid
 ###############################    TF - IDF   #################################################################################################
-conn = sqlite3.connect('db.db', check_same_thread=False) # Contacting the DataBase
+conn = sqlite3.connect('d.db', check_same_thread=False) # Contacting the DataBase
 c = conn.cursor()
 
 
@@ -164,7 +164,7 @@ def sublinear_term_frequency(term, tokenized_document): # getting the term and t
 def inverse_document_frequencies(tokenized_documents): # getting a document
     idf_values = {}
     tokk = tokenized_documents[0]
-    all_tokens_set = set([item for sublist in tokenized_documents for item in sublist]) # creating a set of all the terms in all the documents
+    all_tokens_set = set(tokk) # creating a set of all the terms in all the documents
     for tkn in all_tokens_set: # for every word
         contains_token = map(lambda doc: tkn in doc, tokenized_documents) #  nurmlizing all words inside the doc
         idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token))) # puts in dictionary the value of each word by dividing the number of times the word appears by the total words
@@ -263,7 +263,7 @@ def index(KEYWORD):
         else:
             i=1
         if (len(textOutPut[0].split()))  > 2:
-            title = title[((textOutPut[2]-1)/2)]
+            title = title[((textOutPut[2])/2)]
             create_name(ID ,textInput, textOut, title, 1) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
@@ -283,7 +283,7 @@ def index(KEYWORD):
         else:
             i=1
         if (len(textOutPut[0].split()))  > 2:
-            title = title[((textOutPut[2]-1)/2)]# Gets info about the text
+            title = title[((textOutPut[2])/2)]# Gets info about the text
             create_name(ID ,textInput, textOut, title, 1) #updating the DB 
         textOutPut = textOutPut[0].replace("\n", "")
         textOutPut = textOutPut.replace("\'", "")
